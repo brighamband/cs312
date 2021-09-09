@@ -20,9 +20,11 @@ def fprobability(k):
 
 
 def mprobability(k):
-    # You will need to implement this function and change the return value.   
-    return 0.0
+    return 1    # Perfect?
 
+# prime_test
+
+# prime_test2 (if not used directly in fermat)
 
 def fermat(N,k):
     # You will need to implement this function and change the return value, which should be
