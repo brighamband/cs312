@@ -20,7 +20,7 @@ def fprobability(k):
 
 
 def mprobability(k):
-    return 1    # Perfect?
+    return 1/(4**k)      # Still possible to fail, not perfect.  1/(4**k)?
 
 # prime_test
 
