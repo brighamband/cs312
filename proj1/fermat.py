@@ -17,11 +17,11 @@ def mod_exp(x, y, N):                                                   # O(n^3)
     return x*(z**2) % N                                                 # O(n^2)
     
 
-def fprobability(k):
+def fprobability(k):                                                    # O(n^2) for function
     return 1 - 1/(2**k)                                                 # O(n^2)
 
 
-def mprobability(k):
+def mprobability(k):                                                    # O(n^2) for function
     return 1 - 1/(4**k)                                                 # O(n^2)
 
 
