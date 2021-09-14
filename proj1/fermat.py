@@ -1,4 +1,5 @@
 import random
+import math
 
 
 def prime_test(N, k):
@@ -9,9 +10,9 @@ def prime_test(N, k):
 def mod_exp(x, y, N):                                               # O(n^3) for function (O(n) for run through + O(n^2))
     if y == 0:                                                      # O(c)
         return 1                                                    # O(c)
-    z = mod_exp(x, y/2, N)                                          # O(n^2)
+    z = mod_exp(x, math.trunc(y/2), N)   # truncate rounds down to nearest whole number                                       # O(n^2)
     if y % 2 == 0:                                                  # O(c)
-        return pow(z,2,N)                                           # O(n^2)
+        return (z**2) % N                                           # O(n^2)
     return x*(z**2) % N                                            # O(n^2)
     
 
@@ -25,7 +26,7 @@ def mprobability(k):
 
 def f_prime_test(N):    # Essentially prime_test_1
     a = 1 if N == 1 else random.randint(1, N - 1)             # 1 < a <= n - 1   
-    if pow(a,N-1,N) == 1:   # Fermat's little theorem             # FIXME
+    if mod_exp(a,N-1,N) == 1:   # Fermat's little theorem             # FIXME
         return True                                                # O(c)
     return False                                                     # O(c)
 
@@ -41,10 +42,10 @@ def m_prime_test(N): # Tests one number at a time
     exponent = N - 1
     while not exponent & 1:
         exponent >>= 1
-    if pow(a,exponent,N) == 1:
+    if mod_exp(a,exponent,N) == 1:
         return True
     while exponent < N - 1:
-        if pow(a,exponent,N) == N - 1:
+        if mod_exp(a,exponent,N) == N - 1:
             return True
         exponent <<= 1
     return False
