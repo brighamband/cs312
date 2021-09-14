@@ -25,6 +25,7 @@ def mprobability(k):                                                    # O(n^2)
     return 1 - 1/(4**k)                                                 # O(n^2)
 
 
+'''Singular fermat prime test called iteratively from fermat function'''
 def f_prime_test(N):    # Essentially prime_test_1                      # O(n^3) for function (mod_exp is O(n^3))
     # a is random number a where 1 <= a < n 
     a = 1 if N == 1 else random.randint(1, N - 1)                       # O(log n) - twice as slow for every n bit in range
@@ -39,6 +40,8 @@ def fermat(N,k):    # Essentially prime_test2                           # O(n^3)
             return 'composite'                                          # O(1)
     return 'prime'                                                      # O(1)
 
+
+'''Singular Millar-Rabin prime test called iteratively from miller_rabin function'''
 def m_prime_test(N): # Tests one number at a time                       # FIXME for function
     # a is random number a where 1 <= a < n 
     a = 1 if N == 1 else random.randint(1, N - 1)                       # O(log n) - twice as slow for every n bit in range
