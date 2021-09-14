@@ -11,8 +11,8 @@ def mod_exp(x, y, N):                                               # O(n^3) for
         return 1                                                    # O(c)
     z = mod_exp(x, y/2, N)                                          # O(n^2)
     if y % 2 == 0:                                                  # O(c)
-        return (z**2) % N                                           # O(n^2)
-    return (x*(z**2)) % N                                           # O(n^2)
+        return z**2 % N                                           # O(n^2)
+    return x*(z**2) % N                                           # O(n^2)
     
 
 def fprobability(k):
@@ -25,23 +25,20 @@ def mprobability(k):
 
 def prime_test1(N):
     # pick a random positive number a that is between 1 and N (inclusive)
-    a = random.randint(1, N)                                      # O(c)
-    if a^(N-1) % N == 1:                                          # FIXME
-        print('ran here => a', a)
+    a = random.randint(1, N-1)    # N - 1 because A can't == N      # O(c)
+    if (a**(N-1)) % N == 1:    # Fermat's little theorem             # FIXME
+        print('true')
         return True                                                # O(c)
-    print('reached end of pt1 -> a', a)
+    print('false')
     return False                                                     # O(c)
 
 
 def fermat(N,k):    # Essentially prime_test2
-    if prime_test1(N) == False:
-        return 'prime'
-    return 'composite'
-
-    # for i in range(k):
-    #     if prime_test1(N) == False:
-    #         return 'prime'
-    # return 'composite'
+    for i in range(0, k):
+        print('i',i)
+        if prime_test1(N) == False:
+            return 'composite'
+    return 'prime'
 
 def miller_rabin(N,k):
     # You will need to implement this function and change the return value, which should be
