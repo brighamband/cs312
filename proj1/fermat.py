@@ -38,20 +38,15 @@ def fermat(N,k):    # Essentially prime_test2
 
 def m_prime_test(N): # Tests one number at a time
     a = 1 if N == 1 else random.randint(1, N - 1)   # 1 < a <= n - 1
-
     exponent = N - 1
-
     while not exponent & 1:
         exponent >>= 1
-    
     if pow(a,exponent,N) == 1:
         return True
-
     while exponent < N - 1:
         if pow(a,exponent,N) == N - 1:
             return True
         exponent <<= 1
-
     return False
 
 
