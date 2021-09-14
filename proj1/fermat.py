@@ -11,8 +11,8 @@ def mod_exp(x, y, N):                                               # O(n^3) for
         return 1                                                    # O(c)
     z = mod_exp(x, y/2, N)                                          # O(n^2)
     if y % 2 == 0:                                                  # O(c)
-        return z**2 % N                                           # O(n^2)
-    return x*(z**2) % N                                           # O(n^2)
+        return pow(z,2,N)                                           # O(n^2)
+    return x*(z**2) % N                                            # O(n^2)
     
 
 def fprobability(k):
@@ -23,25 +23,40 @@ def mprobability(k):
     return 1 - 1/(4**k)     # FIXME - Explain                           # O(n^2) ?? FIXME
 
 
-def prime_test1(N):
-    # pick a random positive number a that is between 1 and N (inclusive)
-    a = 1 if N == 1 else random.randint(1, N - 1)                   # a can never be negative, and it can never be == N     
-    if (a**(N-1)) % N == 1:    # Fermat's little theorem             # FIXME
+def f_prime_test(N):    # Essentially prime_test_1
+    a = 1 if N == 1 else random.randint(1, N - 1)             # 1 < a <= n - 1   
+    if pow(a,N-1,N) == 1:   # Fermat's little theorem             # FIXME
         return True                                                # O(c)
     return False                                                     # O(c)
 
 
 def fermat(N,k):    # Essentially prime_test2
-    for i in range(0, k):
-        if prime_test1(N) == False:
+    for i in range(k):
+        if f_prime_test(N) == False:
             return 'composite'
     return 'prime'
 
+def m_prime_test(N): # Tests one number at a time
+    a = 1 if N == 1 else random.randint(1, N - 1)   # 1 < a <= n - 1
+
+    exponent = N - 1
+
+    while not exponent & 1:
+        exponent >>= 1
+    
+    if pow(a,exponent,N) == 1:
+        return True
+
+    while exponent < N - 1:
+        if pow(a,exponent,N) == N - 1:
+            return True
+        exponent <<= 1
+
+    return False
+
+
 def miller_rabin(N,k):
-    # You will need to implement this function and change the return value, which should be
-    # either 'prime' or 'composite'.
-	#
-    # To generate random values for a, you will most likely want to use
-    # random.randint(low,hi) which gives a random integer between low and
-    #  hi, inclusive.
-	return 'composite'
+    for i in range(k):
+        if m_prime_test(N) == False:
+            return 'composite'
+    return 'prime'
