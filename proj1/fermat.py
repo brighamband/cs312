@@ -25,17 +25,14 @@ def mprobability(k):
 
 def prime_test1(N):
     # pick a random positive number a that is between 1 and N (inclusive)
-    a = random.randint(1, N-1)    # N - 1 because A can't == N      # O(c)
+    a = 1 if N == 1 else random.randint(1, N - 1)                   # a can never be negative, and it can never be == N     
     if (a**(N-1)) % N == 1:    # Fermat's little theorem             # FIXME
-        print('true')
         return True                                                # O(c)
-    print('false')
     return False                                                     # O(c)
 
 
 def fermat(N,k):    # Essentially prime_test2
     for i in range(0, k):
-        print('i',i)
         if prime_test1(N) == False:
             return 'composite'
     return 'prime'
