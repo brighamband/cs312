@@ -11,10 +11,10 @@ def mod_exp(x, y, N):                                                   # O(n^3)
     if y == 0:      # Base case                                         # O(1)
         return 1                                                        
     # Recursive call (trunc rounds down to nearest whole number)
-    z = mod_exp(x, math.trunc(y/2), N)                                  # O(n^2)
+    z = mod_exp(x, math.trunc(y/2), N)                                  # O(n^2) + O(1)
     if y % 2 == 0:                                                      # O(1)
-        return (z**2) % N                                               # O(n^2)
-    return x*(z**2) % N                                                 # O(n^2)
+        return (z**2) % N                                               # O(n^2) + O(n^2) + O(1)
+    return x*(z**2) % N                                                 # O(n^2) + O(n^2) + O(n^2) + O(1)
     
 
 def fprobability(k):                                                    # O(n^2) for function
