@@ -76,7 +76,17 @@ class ConvexHullSolver(QObject):
 		# when passing lines to the display, pass a list of QLineF objects.  Each QLineF
 		# object can be created with two QPointF objects corresponding to the endpoints
 		self.showHull(polygon,RED)
-		self.showText('Time Elapsed (Convex Hull): {:3.3f} sec'.format(t4-t3))
+		timeElapsed = (t2 - t1) + (t3 + t4)		# Time will be for sorting and solving combined
+		self.showText('Time Elapsed (Convex Hull): {:3.3f} sec'.format(timeElapsed))
 
+		polygon = []
 
+class Hull():
+	hull = []
 
+	def __init__(self):
+		pass
+
+	def at(self, index):
+		# Make indexing circular
+		return hull[index % len(hull)]
