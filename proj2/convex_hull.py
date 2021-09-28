@@ -69,9 +69,7 @@ class ConvexHullSolver(QObject):
 		t2 = time.time()
 
 		t3 = time.time()
-		# this is a dummy polygon of the first 3 unsorted points
-		polygon = [QLineF(points[i],points[(i+1)%3]) for i in range(3)]
-		# TODO: REPLACE THE LINE ABOVE WITH A CALL TO YOUR DIVIDE-AND-CONQUER CONVEX HULL SOLVER
+		polygon = self.solve(points)
 		t4 = time.time()
 
 		# when passing lines to the display, pass a list of QLineF objects.  Each QLineF
@@ -81,6 +79,13 @@ class ConvexHullSolver(QObject):
 		self.showText('Time Elapsed (Convex Hull): {:3.3f} sec'.format(timeElapsed))	# FIXME - Ask TA - Should time elapsed include the time it takes to sort
 
 		polygon = []
+
+	'''Divide-and-conquer Convex Hull Solver'''
+	def solve(self, points):
+		# this is a dummy polygon of the first 3 unsorted points
+		polygon = [QLineF(points[i],points[(i+1)%3]) for i in range(3)]
+		return polygon
+
 
 	def findUpperTangent(self, leftHull, rightHull):
 		# rightmostLeft, leftmostRight = #max(leftHull), min(rightHull)
