@@ -24,7 +24,7 @@ PAUSE = 0.25
 #
 class ConvexHullSolver(QObject):
 
-# Class constructor
+	# Class constructor
 	def __init__( self):
 		super().__init__()
 		self.pause = False
@@ -122,14 +122,19 @@ class ConvexHullSolver(QObject):
 		# 		done = 0
 		# return temp
 
-	'''Finds the next clockwise neighbor in a hull.'''
-	def find_cw_neighbor(self, curr, hull):
-		pass
 
-	'''Finds the next counter-clockwise neighbor in a hull.'''
-	def find_ccw_neighbor(self, curr, hull):
+	'''Sorts points in hull in clockwise order (array can be traversed backwards for counter-clockwise).'''
+	def sortHull(self):
 		pass
 
 	'''Returns index of item in hull (handles logic so that hull can loop circularly).'''
 	def at(self, hull, index):
 		return hull[index % len(hull)]
+
+	'''Finds the next clockwise neighbor in a hull.'''
+	def findCW(self, hull, currIndex):
+		return hull[currIndex + 1]
+
+	'''Finds the next counter-clockwise neighbor in a hull.'''
+	def findCCW(self, hull, currIndex):
+		return hull[currIndex - 1]
