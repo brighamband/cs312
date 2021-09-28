@@ -64,7 +64,8 @@ class ConvexHullSolver(QObject):
 		assert( type(points) == list and type(points[0]) == QPointF )
 
 		t1 = time.time()
-		# TODO: SORT THE POINTS BY INCREASING X-VALUE
+		# Sorts the points by increasing x-value - FIXME - ASK TA IF THIS IS OK, OR IF WE NEED OUR OWN QUICK SORT
+		points = [item[1] for item in sorted([(pt.x(),pt) for pt in points])]
 		t2 = time.time()
 
 		t3 = time.time()
@@ -76,7 +77,7 @@ class ConvexHullSolver(QObject):
 		# when passing lines to the display, pass a list of QLineF objects.  Each QLineF
 		# object can be created with two QPointF objects corresponding to the endpoints
 		self.showHull(polygon,RED)
-		timeElapsed = (t2 - t1) + (t3 + t4)		# Time will be for sorting and solving combined
+		timeElapsed = (t2 - t1) + (t4 -t3)		# Time will be for sorting and solving combined
 		self.showText('Time Elapsed (Convex Hull): {:3.3f} sec'.format(timeElapsed))
 
 		polygon = []
