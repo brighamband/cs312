@@ -64,11 +64,9 @@ class ConvexHullSolver(QObject):
 		assert(type(points) == list and type(points[0]) == QPointF)
 
 		t1 = time.time()
-		# Sorts the points by increasing x-value - FIXME - ASK TA IF THIS IS OK, OR IF WE NEED OUR OWN QUICK SORT
-		points = [item[1] for item in sorted([(pt.x(),pt) for pt in points])]
+		# Sorts the points by increasing x-value
+		points.sort(key= lambda k: k.x())	# Overwrites points with same but new order
 		t2 = time.time()
-
-		
 
 		t3 = time.time()
 		# this is a dummy polygon of the first 3 unsorted points
@@ -85,25 +83,25 @@ class ConvexHullSolver(QObject):
 		polygon = []
 
 	def findUpperTangent(self, leftHull, rightHull):
-		rightmostLeft, leftmostRight = #max(leftHull), min(rightHull)
+		# rightmostLeft, leftmostRight = #max(leftHull), min(rightHull)
 		
 		pass#leftHull[-1], rightHull[0]	# Find leftmost and rightmost points
 
-		temp = line(p,q)
-		done = 0
-		while not done:
-			done = 1
-			while temp != is not upper tangent to L:
-				r = p's counterclockwise neighbor
-				temp = line(r,q)
-				p = r
-				done = 0
-			while temp is not upper tangent to R:
-				r = q's clockwise neighbor
-				temp = line(p,r)
-				q = r
-				done = 0
-		return temp
+		# temp = line(p,q)
+		# done = 0
+		# while not done:
+		# 	done = 1
+		# 	while temp != is not upper tangent to L:
+		# 		r = p's counterclockwise neighbor
+		# 		temp = line(r,q)
+		# 		p = r
+		# 		done = 0
+		# 	while temp is not upper tangent to R:
+		# 		r = q's clockwise neighbor
+		# 		temp = line(p,r)
+		# 		q = r
+		# 		done = 0
+		# return temp
 
 		# def findLowerTangent(self, leftHull, rightHull):
 		# leftmost, rightmost = leftHull[0], rightHull[-1]	# Find leftmost and rightmost points
