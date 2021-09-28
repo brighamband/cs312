@@ -58,10 +58,10 @@ class ConvexHullSolver(QObject):
 
 # This is the method that gets called by the GUI and actually executes
 # the finding of the hull
-	def compute_hull( self, points, pause, view):
+	def compute_hull(self, points, pause, view):
 		self.pause = pause
 		self.view = view
-		assert( type(points) == list and type(points[0]) == QPointF )
+		assert(type(points) == list and type(points[0]) == QPointF)
 
 		t1 = time.time()
 		# Sorts the points by increasing x-value - FIXME - ASK TA IF THIS IS OK, OR IF WE NEED OUR OWN QUICK SORT
