@@ -85,7 +85,9 @@ class ConvexHullSolver(QObject):
 		polygon = []
 
 	def findUpperTangent(self, leftHull, rightHull):
-		leftmost, rightmost = leftHull[0], rightHull[-1]	# Find leftmost and rightmost points
+		rightmostLeft, leftmostRight = #max(leftHull), min(rightHull)
+		
+		pass#leftHull[-1], rightHull[0]	# Find leftmost and rightmost points
 
 		temp = line(p,q)
 		done = 0
