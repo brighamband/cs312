@@ -68,6 +68,8 @@ class ConvexHullSolver(QObject):
 		points = [item[1] for item in sorted([(pt.x(),pt) for pt in points])]
 		t2 = time.time()
 
+		
+
 		t3 = time.time()
 		# this is a dummy polygon of the first 3 unsorted points
 		polygon = [QLineF(points[i],points[(i+1)%3]) for i in range(3)]
@@ -78,16 +80,56 @@ class ConvexHullSolver(QObject):
 		# object can be created with two QPointF objects corresponding to the endpoints
 		self.showHull(polygon,RED)
 		timeElapsed = (t2 - t1) + (t4 -t3)		# Time will be for sorting and solving combined
-		self.showText('Time Elapsed (Convex Hull): {:3.3f} sec'.format(timeElapsed))
+		self.showText('Time Elapsed (Convex Hull): {:3.3f} sec'.format(timeElapsed))	# FIXME - Ask TA - Should time elapsed include the time it takes to sort
 
 		polygon = []
 
-class Hull():
-	hull = []
+	def findUpperTangent(self, leftHull, rightHull):
+		leftmost, rightmost = leftHull[0], rightHull[-1]	# Find leftmost and rightmost points
 
-	def __init__(self):
+		temp = line(p,q)
+		done = 0
+		while not done:
+			done = 1
+			while temp != is not upper tangent to L:
+				r = p's counterclockwise neighbor
+				temp = line(r,q)
+				p = r
+				done = 0
+			while temp is not upper tangent to R:
+				r = q's clockwise neighbor
+				temp = line(p,r)
+				q = r
+				done = 0
+		return temp
+
+		# def findLowerTangent(self, leftHull, rightHull):
+		# leftmost, rightmost = leftHull[0], rightHull[-1]	# Find leftmost and rightmost points
+
+		# temp = line(p,q)
+		# done = 0
+		# while not done:
+		# 	done = 1
+		# 	while temp != is not lower tangent to L:
+		# 		r = p's clockwise neighbor
+		# 		temp = line(r,q)
+		# 		p = r
+		# 		done = 0
+		# 	while temp is not lower tangent to R:
+		# 		r = q's counter-clockwise neighbor
+		# 		temp = line(p,r)
+		# 		q = r
+		# 		done = 0
+		# return temp
+
+	'''Finds the next clockwise neighbor in a hull.'''
+	def find_cw_neighbor(self, curr, hull):
 		pass
 
-	def at(self, index):
-		# Make indexing circular
+	'''Finds the next counter-clockwise neighbor in a hull.'''
+	def find_ccw_neighbor(self, curr, hull):
+		pass
+
+	'''Returns index of item in hull (handles logic so that hull can loop circularly).'''
+	def at(self, hull, index):
 		return hull[index % len(hull)]
