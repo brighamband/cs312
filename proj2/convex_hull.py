@@ -61,6 +61,7 @@ class ConvexHullSolver(QObject):
   def compute_hull(self, points, pause, view):
     self.pause = pause
     self.view = view
+
     assert(type(points) == list and type(points[0]) == QPointF)
 
     t1 = time.time()
@@ -69,7 +70,8 @@ class ConvexHullSolver(QObject):
     t2 = time.time()
 
     t3 = time.time()
-    polygon = self.solve(points)
+    polygonPts = self.solve(points)
+    polygon = self.toPolygon(polygonPts)
     t4 = time.time()
 
     self.showTangent(polygon, BLUE);
@@ -84,36 +86,44 @@ class ConvexHullSolver(QObject):
 
   '''Divide-and-conquer convex hull solver (recursive)'''
   def solve(self, points):
-    # return [QLineF(QPointF(points[0]), points[1]),QLineF(QPointF(points[2]), points[3])]
     # Base case - combine # FIXME - FIGURE OUT HOW TO DO IT WITH 1 BASE CASE
-    if len(points) == 1:  # If just one point, have an array with 1 line pointing to itself
-      return [QLineF(points[0], points[0])]
-    if len(points) == 2:
-      return [QLineF(points[0], points[1])]
+    # if len(points) == 1:  # If just one point, have an array with 1 line pointing to itself
+    #   return [QLineF(points[0], points[0])]
+    if len(points) <= 2:  # If 2 points, have array with 1 line connecting the 2 points
+      return points
 
-    #   print('base case')
-    # Break up points into they are size 1
+    # Break up points
     midIdx = len(points) // 2
     leftHull = self.solve(points[:midIdx])	# First half
     rightHull = self.solve(points[midIdx:])	# Second half
     return self.combine(leftHull, rightHull)
+  
+  '''Converts array of QPointF points to an array of QLineF lines'''
+  def toPolygon(self, points):
+    if len(points) == 1:
+      return [QLineF(points[0], points[0])]
 
-  '''Temp - just returns line between highest point on left and highest point on right'''
-  def tempFindUpperTan(self, leftHull, rightHull):
-    print('type left', type(leftHull[0]))
-    print('type right', type(rightHull[0]))
-    leftHighest = max(leftHull, key= lambda k: k.y1())	
-    rightHighest = max(rightHull, key= lambda k: k.y1())	
-    return leftHull.index(leftHighest), rightHull.index(rightHighest)
+    if len(points) == 2:
+      return [QLineF(points[0], points[1])]
+      
+    polygon = []
+    for i in range(len(points)):
+      if i < len(points) - 1:
+        polygon.append(QLineF(points[i], points[i+1]))
+      else:   # On last iteration connect last point to first
+        polygon.append(QLineF(points[i], points[0]))
+    return polygon
 
-  '''Temp - just returns line between lowest point on left and lowest point on right'''
-  def tempFindLowerTan(self, leftHull, rightHull):
-    leftLowest = max(leftHull, key= lambda k: k.y1())	
-    rightLowest = max(rightHull, key= lambda k: k.y1())	
-    return leftHull.index(leftLowest), rightHull.index(rightLowest)
+  '''
+  NOTE
+  Hulls are sorted in cw order
+  The 1st element in a hull is its leftmost point
+  '''
 
   '''Finds upper tangent of each hull, then returns back indices for the 2 upper tangents.'''
   def findUpperTangent(self, leftHull, rightHull):
+    return 0, 0  # TESTING
+
     # Find rightmost point of left hullleftmost and rightmost points
     leftHullIdx = leftHull.getRightmostPtIdx()
     rightHullIdx = rightHull.getLeftmostPtIdx() # Hulls start with leftmost point
@@ -128,14 +138,14 @@ class ConvexHullSolver(QObject):
       # while temp != is not upper tangent to L:
       # while self.findSlope(temp) < bestSlope:   # FIXME - Does this work???
       while True: # FIXME FIXME FIXME
-        leftHullCCWPt = leftHull[leftHullIdx - 1] # Rotate to next point in left hull counter-clockwise
+        leftHullCCWPt = leftHull.findCCW(leftHullIdx) # leftHull[leftHullIdx - 1] # Rotate to next point in left hull counter-clockwise
         temp = QLineF(leftHullCCWPt, rightHullIdx)
         leftHullIdx = leftHullCCWPt
         done = False
 
       # while temp != is not upper tangent to R:
       while True: # FIXME FIXME FIXME
-        rightHullCWPt = rightHull[rightHullIdx + 1] # Rotate to next point in right hull clockwise
+        rightHullCWPt = rightHull.findCW(rightHullIdx) #rightHull[rightHullIdx + 1] # Rotate to next point in right hull clockwise
         temp = QLineF(leftHullIdx, rightHullCWPt)
         rightHullIdx = rightHullCWPt
         done = False
@@ -143,7 +153,8 @@ class ConvexHullSolver(QObject):
     return temp # Type: QLineF
 
   def findLowerTangent(self, leftHull, rightHull):
-    pass
+    return 0, 1   # TESTING
+
     # leftmost, rightmost = leftHull[0], rightHull[-1]	# Find leftmost and rightmost points
 
     # temp = line(p,q)
@@ -165,65 +176,46 @@ class ConvexHullSolver(QObject):
   '''Combines 2 hulls together (returns a list of lines)'''
   def combine(self, leftHull, rightHull):
     # Find upper tangent connecting the hulls
-    leftHUpperIdx, rightHUpperIdx = self.tempFindUpperTan(leftHull, rightHull) #self.findUpperTangent(leftHull, rightHull)
+    leftHUpperIdx, rightHUpperIdx = self.findUpperTangent(leftHull, rightHull)
     # Find lower tangent connecting the hulls
-    leftHLowerIdx, rightHLowerIdx = self.tempFindLowerTan(leftHull, rightHull) #self.findLowerTangent(leftHull, rightHull)
+    leftHLowerIdx, rightHLowerIdx = self.findLowerTangent(leftHull, rightHull)
     # Connect the hulls with the 2 tangent lines
 
-    print('e', leftHUpperIdx, leftHull[leftHUpperIdx].p1())
+    print('lh', leftHull)
+    print('lh1', leftHull[0])
+    print('rh', rightHull)
+    print('luti', leftHUpperIdx)
+    print('ruti', rightHUpperIdx)
+    print('llti', leftHLowerIdx)
+    print('rlti', rightHLowerIdx)
 
-    comboHull = Hull()
-    comboHull.add(leftHull[leftHLowerIdx:leftHUpperIdx])   # Part of left hull to keep
-    comboHull.add(QLineF(leftHull[leftHUpperIdx].p1(), rightHull[rightHUpperIdx].p1()))    # Upper tangent connection
-    comboHull.add(rightHull[rightHUpperIdx:rightHLowerIdx])    # Part of right hull to keep
-    comboHull.add(QLineF(rightHull[rightHLowerIdx].p1(), leftHull[leftHLowerIdx].p1()))    # Lower tangent connection
-
+    comboHull = []
+    comboHull += self.grabPoints(leftHull, leftHLowerIdx, leftHUpperIdx) # Part of left hull to keep
+    comboHull += self.grabPoints(rightHull, rightHUpperIdx, rightHLowerIdx) # Part of right hull to keep
     return comboHull
 
   '''Calculates the slope of the line connecting 2 points (formula: slope = (y2 - y1) / (x2 - x1))'''
   # def findSlope(self, point1, point2):
   #   return (point2.y() - point1.y()) / (point2.x() + point1.x())
 
+  '''Finds slope of a line'''
   def findSlope(self, line):
-    return 1.0
-    # point1 = line.p1()
-    # point2 = line.p2()
-    # return (point2.y() - point1.y()) / (point2.x() + point1.x())
+    return line.dy() / line.dx()
 
+  '''Returns index of item in hull (handles logic so that hull can loop circularly).'''
+  def at(self, hull, index):
+    return hull[index % len(hull)]
 
-class Hull:   
-  hull = []   # List of QLineFs
-
-  # Hulls are sorted in cw order
-  # The 1st element in a hull is its leftmost point
-
-  def __init__(self):   # Empty constructor
-        self.hull = []
-
-  def add(self, line):
-    self.hull.append(line)
-
-  '''Overloading the [] operator - returns index of item in hull (handles logic so that hull can loop circularly).'''
-  def __getitem__(self, index):
-      return self.hull[index % len(self.hull)]
+  def grabPoints(self, hull, firstPtIdx, lastPtIdx):
+    firstPtIdx = firstPtIdx % len(hull)
+    lastPtIdx = lastPtIdx % len(hull)
+    return hull[firstPtIdx : lastPtIdx + 1]
 
   '''Returns the index of the leftmost point in hull'''
-  def getLeftmostPtIdx(self):
+  def getLeftmostPtIdx(self, hull):
     return 0
 
   '''Returns the index of the rightmost point in hull'''
-  def getRightmostPtIdx(self):
-    biggestXVal = max(self.hull, key= lambda k: k.x())
-    return self.hull.index(biggestXVal)
-
-  '''Finds the next clockwise neighbor in a hull.'''
-  def findCW(self, hull, currIndex):
-    return hull[currIndex + 1]
-
-  '''Finds the next counter-clockwise neighbor in a hull.'''
-  def findCCW(self, hull, currIndex):
-    return hull[currIndex - 1]
-
-  # '''Returns index of item in hull (handles logic so that hull can loop circularly).'''
-  # def at(self, hull, index):
-  #   return hull[index % len(hull)]
+  def getRightmostPtIdx(self, hull):
+    biggestXVal = max(hull, key= lambda k: k.x())
+    return hull.index(biggestXVal)
