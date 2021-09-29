@@ -82,16 +82,35 @@ class ConvexHullSolver(QObject):
 
     polygon = []
 
-  '''Divide-and-conquer Convex Hull Solver'''
+  '''Divide-and-conquer convex hull solver (recursive)'''
   def solve(self, points):
+    # return [QLineF(QPointF(points[0]), points[1]),QLineF(QPointF(points[2]), points[3])]
     # Base case - combine # FIXME - FIGURE OUT HOW TO DO IT WITH 1 BASE CASE
+    if len(points) == 1:  # If just one point, have an array with 1 line pointing to itself
+      return [QLineF(points[0], points[0])]
     if len(points) == 2:
-    	return QLineF(points[0], points[1])	# Might have to convert to list?
+      return [QLineF(points[0], points[1])]
+
+    #   print('base case')
     # Break up points into they are size 1
     midIdx = len(points) // 2
     leftHull = self.solve(points[:midIdx])	# First half
     rightHull = self.solve(points[midIdx:])	# Second half
-    return self.combine(leftHull, rightHull)	
+    return self.combine(leftHull, rightHull)
+
+  '''Temp - just returns line between highest point on left and highest point on right'''
+  def tempFindUpperTan(self, leftHull, rightHull):
+    print('type left', type(leftHull[0]))
+    print('type right', type(rightHull[0]))
+    leftHighest = max(leftHull, key= lambda k: k.y1())	
+    rightHighest = max(rightHull, key= lambda k: k.y1())	
+    return leftHull.index(leftHighest), rightHull.index(rightHighest)
+
+  '''Temp - just returns line between lowest point on left and lowest point on right'''
+  def tempFindLowerTan(self, leftHull, rightHull):
+    leftLowest = max(leftHull, key= lambda k: k.y1())	
+    rightLowest = max(rightHull, key= lambda k: k.y1())	
+    return leftHull.index(leftLowest), rightHull.index(rightLowest)
 
   '''Finds upper tangent of each hull, then returns back indices for the 2 upper tangents.'''
   def findUpperTangent(self, leftHull, rightHull):
@@ -146,17 +165,19 @@ class ConvexHullSolver(QObject):
   '''Combines 2 hulls together (returns a list of lines)'''
   def combine(self, leftHull, rightHull):
     # Find upper tangent connecting the hulls
-    leftHUpperIdx, rightHUpperIdx = self.findUpperTangent(leftHull, rightHull)
+    leftHUpperIdx, rightHUpperIdx = self.tempFindUpperTan(leftHull, rightHull) #self.findUpperTangent(leftHull, rightHull)
     # Find lower tangent connecting the hulls
-    leftHLowerIdx, rightHLowerIdx = self.findLowerTangent(leftHull, rightHull)
+    leftHLowerIdx, rightHLowerIdx = self.tempFindLowerTan(leftHull, rightHull) #self.findLowerTangent(leftHull, rightHull)
     # Connect the hulls with the 2 tangent lines
-    comboHull = Hull()
-    comboHull.append(leftHull[leftHLowerIdx:leftHUpperIdx])   # Part of left hull to keep
-    comboHull.append(QLineF(leftHull[leftHUpperIdx], rightHull[rightHUpperIdx]))    # Upper tangent connection
-    comboHull.append(rightHull[rightHUpperIdx:rightHLowerIdx])    # Part of right hull to keep
-    comboHull.append(QLineF(rightHull[rightHLowerIdx], leftHull[leftHLowerIdx]))    # Lower tangent connection
 
-    # return QLineF(leftHull[0],rightHull[0])
+    print('e', leftHUpperIdx, leftHull[leftHUpperIdx].p1())
+
+    comboHull = Hull()
+    comboHull.add(leftHull[leftHLowerIdx:leftHUpperIdx])   # Part of left hull to keep
+    comboHull.add(QLineF(leftHull[leftHUpperIdx].p1(), rightHull[rightHUpperIdx].p1()))    # Upper tangent connection
+    comboHull.add(rightHull[rightHUpperIdx:rightHLowerIdx])    # Part of right hull to keep
+    comboHull.add(QLineF(rightHull[rightHLowerIdx].p1(), leftHull[leftHLowerIdx].p1()))    # Lower tangent connection
+
     return comboHull
 
   '''Calculates the slope of the line connecting 2 points (formula: slope = (y2 - y1) / (x2 - x1))'''
@@ -164,9 +185,10 @@ class ConvexHullSolver(QObject):
   #   return (point2.y() - point1.y()) / (point2.x() + point1.x())
 
   def findSlope(self, line):
-    point1 = line[0]
-    point2 = line[1]
-    return (point2.y() - point1.y()) / (point2.x() + point1.x())
+    return 1.0
+    # point1 = line.p1()
+    # point2 = line.p2()
+    # return (point2.y() - point1.y()) / (point2.x() + point1.x())
 
 
 class Hull:   
@@ -175,8 +197,11 @@ class Hull:
   # Hulls are sorted in cw order
   # The 1st element in a hull is its leftmost point
 
-  def __init__(self, line):
-    self.hull = [line]
+  def __init__(self):   # Empty constructor
+        self.hull = []
+
+  def add(self, line):
+    self.hull.append(line)
 
   '''Overloading the [] operator - returns index of item in hull (handles logic so that hull can loop circularly).'''
   def __getitem__(self, index):
