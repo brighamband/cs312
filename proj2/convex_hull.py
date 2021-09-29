@@ -19,6 +19,8 @@ BLUE = (0,0,255)
 #
 PAUSE = 0.25
 
+LEFTMOST_PT_IDX = 0 # In hulls created, leftmost points will be index 0
+
 #
 # This is the class you have to complete.
 #
@@ -64,10 +66,8 @@ class ConvexHullSolver(QObject):
 
     assert(type(points) == list and type(points[0]) == QPointF)
 
-    t1 = time.time()
     # Sorts the points by increasing x-value
     points.sort(key= lambda k: k.x())	# Overwrites points with same but new order
-    t2 = time.time()
 
     t3 = time.time()
     polygonPts = self.solve(points)
@@ -79,8 +79,7 @@ class ConvexHullSolver(QObject):
     # when passing ines to the display, pass a list of QLineF objects.  Each QLineF
     # object can be created with two QPointF objects corresponding to the endpoints
     self.showHull(polygon,RED)
-    timeElapsed = (t2 - t1) + (t4 -t3)		# Time will be for sorting and solving combined
-    self.showText('Time Elapsed (Convex Hull): {:3.3f} sec'.format(timeElapsed))	# FIXME - Ask TA - Should time elapsed include the time it takes to sort
+    self.showText('Time Elapsed (Convex Hull): {:3.3f} sec'.format(t4 - t3))
 
     polygon = []
 
@@ -122,35 +121,40 @@ class ConvexHullSolver(QObject):
 
   '''Finds upper tangent of each hull, then returns back indices for the 2 upper tangents.'''
   def findUpperTangent(self, leftHull, rightHull):
-    return 0, 0  # TESTING
-
+    # return 0, 0  # TESTING FIXME
     # Find rightmost point of left hullleftmost and rightmost points
-    leftHullIdx = leftHull.getRightmostPtIdx()
-    rightHullIdx = rightHull.getLeftmostPtIdx() # Hulls start with leftmost point
-    
-    temp = QLineF(leftHull[leftHullIdx], rightHull[rightHullIdx])
-    bestSlope = self.findSlope(temp)
-    done = False
+    leftHullIdx = self.getRightmostPtIdx(leftHull)
+    rightHullIdx = LEFTMOST_PT_IDX
 
-    while not done:
-      done = True
+    print('lhi', leftHullIdx)
+    print('rhi', rightHullIdx)
+    
+    currentSlope = self.findSlope(leftHull[leftHullIdx], rightHull[rightHullIdx])
+    fullyOptimized = False
+
+    while not fullyOptimized:
+      fullyOptimized = True
       
-      # while temp != is not upper tangent to L:
-      # while self.findSlope(temp) < bestSlope:   # FIXME - Does this work???
-      while True: # FIXME FIXME FIXME
-        leftHullCCWPt = leftHull.findCCW(leftHullIdx) # leftHull[leftHullIdx - 1] # Rotate to next point in left hull counter-clockwise
-        temp = QLineF(leftHullCCWPt, rightHullIdx)
+      leftHullCCWPt = leftHull[leftHullIdx - 1]   # Left hull's next counter-clockwise point
+      
+      print('rh', rightHull)
+      print('here', rightHull[rightHullIdx])
+      tempNextSlope = self.findSlope(rightHull[rightHullIdx], leftHullCCWPt)
+      print('cs', currentSlope)
+      print('tns', tempNextSlope)
+      if tempNextSlope > currentSlope:
+        currentSlope = tempNextSlope
         leftHullIdx = leftHullCCWPt
-        done = False
+        fullyOptimized = False
 
-      # while temp != is not upper tangent to R:
-      while True: # FIXME FIXME FIXME
-        rightHullCWPt = rightHull.findCW(rightHullIdx) #rightHull[rightHullIdx + 1] # Rotate to next point in right hull clockwise
-        temp = QLineF(leftHullIdx, rightHullCWPt)
+      rightHullCWPt = rightHull[rightHullIdx + 1]   # Right hull's next clockwise point
+      tempNextSlope = self.findSlope(leftHull[leftHullIdx], rightHullCWPt)
+      if tempNextSlope < currentSlope:
+        currentSlope = tempNextSlope
         rightHullIdx = rightHullCWPt
-        done = False
+        fullyOptimized = False
     
-    return temp # Type: QLineF
+    return leftHullIdx, rightHullIdx
 
   def findLowerTangent(self, leftHull, rightHull):
     return 0, 1   # TESTING
@@ -198,8 +202,9 @@ class ConvexHullSolver(QObject):
   # def findSlope(self, point1, point2):
   #   return (point2.y() - point1.y()) / (point2.x() + point1.x())
 
-  '''Finds slope of a line'''
-  def findSlope(self, line):
+  '''Finds slope of the line made by connecting the 2 points passed in'''
+  def findSlope(self, point1, point2):
+    line = QLineF(point1, point2)
     return line.dy() / line.dx()
 
   '''Returns index of item in hull (handles logic so that hull can loop circularly).'''
@@ -210,10 +215,6 @@ class ConvexHullSolver(QObject):
     firstPtIdx = firstPtIdx % len(hull)
     lastPtIdx = lastPtIdx % len(hull)
     return hull[firstPtIdx : lastPtIdx + 1]
-
-  '''Returns the index of the leftmost point in hull'''
-  def getLeftmostPtIdx(self, hull):
-    return 0
 
   '''Returns the index of the rightmost point in hull'''
   def getRightmostPtIdx(self, hull):
