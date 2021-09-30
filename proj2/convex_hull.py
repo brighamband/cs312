@@ -140,8 +140,6 @@ class ConvexHullSolver(QObject):
       print('rh', rightHull)
       print('here', rightHull[rightHullIdx])
       tempNextSlope = self.findSlope(rightHull[rightHullIdx], leftHullCCWPt)
-      print('cs', currentSlope)
-      print('tns', tempNextSlope)
       if tempNextSlope > currentSlope:
         currentSlope = tempNextSlope
         leftHullIdx = leftHullCCWPt
@@ -153,7 +151,7 @@ class ConvexHullSolver(QObject):
         currentSlope = tempNextSlope
         rightHullIdx = rightHullCWPt
         fullyOptimized = False
-    
+      
     return leftHullIdx, rightHullIdx
 
   def findLowerTangent(self, leftHull, rightHull):
