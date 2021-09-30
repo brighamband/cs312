@@ -69,6 +69,7 @@ class ConvexHullSolver(QObject):
     # Sorts the points by increasing x-value
     points.sort(key= lambda k: k.x())	# Overwrites points with same but new order
 
+    print('-----SOLVING NEW HULL-----')
     print('OP', points)
 
     t3 = time.time()
@@ -102,13 +103,7 @@ class ConvexHullSolver(QObject):
     return self.combine(leftHull, rightHull)
   
   '''Converts array of QPointF points to an array of QLineF lines'''
-  def toPolygon(self, points):                                            # O(n)
-    # if len(points) == 1:
-    #   return [QLineF(points[0], points[0])]
-
-    # if len(points) == 2:
-    #   return [QLineF(points[0], points[1])]
-      
+  def toPolygon(self, points):                                            # O(n)      
     polygon = []
     for i in range(len(points)):                                          # O(n)
       if i < len(points) - 1:
