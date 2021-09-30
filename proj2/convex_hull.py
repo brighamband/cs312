@@ -98,15 +98,15 @@ class ConvexHullSolver(QObject):
     return self.combine(leftHull, rightHull)
   
   '''Converts array of QPointF points to an array of QLineF lines'''
-  def toPolygon(self, points):
-    if len(points) == 1:
-      return [QLineF(points[0], points[0])]
+  def toPolygon(self, points):                                            # O(n)
+    # if len(points) == 1:
+    #   return [QLineF(points[0], points[0])]
 
-    if len(points) == 2:
-      return [QLineF(points[0], points[1])]
+    # if len(points) == 2:
+    #   return [QLineF(points[0], points[1])]
       
     polygon = []
-    for i in range(len(points)):
+    for i in range(len(points)):                                          # O(n)
       if i < len(points) - 1:
         polygon.append(QLineF(points[i], points[i+1]))
       else:   # On last iteration connect last point to first
