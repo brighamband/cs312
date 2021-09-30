@@ -170,18 +170,19 @@ class ConvexHullSolver(QObject):
         rightCurrIdx = rightNextIdx
         fullyOptimized = False
       
-    print('curr', currSlope, 'findLower', findLower)
-    return leftCurrIndex, rightCurrIdx
+    return leftCurrIndex % len(leftHull), rightCurrIdx % len(rightHull) # Fix indices top be within array
 
   '''Combines 2 hulls together (returns a list of lines)'''
   def combine(self, leftHull, rightHull):
+    print('---NEW COMBINATION---')
     # Find upper tangent connecting the hulls
     leftHUpperIdx, rightHUpperIdx = self.findTangentIndices(leftHull, rightHull, False)
     # Find lower tangent connecting the hulls
     leftHLowerIdx, rightHLowerIdx = self.findTangentIndices(leftHull, rightHull, True)
     
-    print('lh', leftHull, 'rh', rightHull)
-    print('l👆🏼', leftHUpperIdx, 'r👆🏼', rightHUpperIdx, 'l👇🏼', leftHLowerIdx, 'r👇🏼', rightHLowerIdx)
+    print('lh', leftHull)
+    print('rh', rightHull)
+    print('l👇🏼', leftHLowerIdx, 'l👆🏼', leftHUpperIdx,  'r👇🏼', rightHLowerIdx, 'r👆🏼', rightHUpperIdx)
 
     # Connect the hulls with the 2 tangent lines
     comboHull = []
@@ -198,13 +199,23 @@ class ConvexHullSolver(QObject):
   def at(self, hull, index):
     return hull[index % len(hull)]
 
-  def addPoints(self, newHull, oldHull, firstPtIdx, lastPtIdx):
-    step = 1
-    if firstPtIdx > lastPtIdx:
-      step = -1
-
-    for i in range(firstPtIdx, lastPtIdx + step, step):
-      newHull.append(self.at(oldHull, i))
+  def addPoints(self, newHull, oldHull, currIdx, finalIdx):
+    # Case 1 - finalIdx is equal or bigger
+    if currIdx <= finalIdx:
+      while currIdx <= finalIdx:
+        newHull.append(self.at(oldHull, currIdx))
+        currIdx += 1
+      return newHull
+    
+    # Case 2 - currIdx is bigger
+    while currIdx < len(oldHull):   # Get end of hull
+      newHull.append(self.at(oldHull, currIdx))
+      currIdx += 1
+    
+    currIdx = 0
+    while currIdx <= finalIdx:    # After going back to front, get from there to the index
+      newHull.append(self.at(oldHull, currIdx))
+      currIdx += 1
 
     return newHull
 
