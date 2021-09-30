@@ -164,7 +164,7 @@ class ConvexHullSolver(QObject):
         rightCurrIdx = rightNextIdx
         fullyOptimized = False
       
-    return leftCurrIndex % len(leftHull), rightCurrIdx % len(rightHull) # Fix indices top be within array
+    return leftCurrIndex % len(leftHull), rightCurrIdx % len(rightHull) # Adjusts indices to be within array
 
   '''Combines 2 hulls together (returns a list of lines)'''
   def combine(self, leftHull, rightHull):
