@@ -69,6 +69,7 @@ class ConvexHullSolver(QObject):
     # Sorts the points by increasing x-value
     points.sort(key= lambda k: k.x())	# Overwrites points with same but new order
 
+    print()
     print('-----SOLVING NEW HULL-----')
     print('OP', points)
 
@@ -90,13 +91,11 @@ class ConvexHullSolver(QObject):
 
   '''Divide-and-conquer convex hull solver (recursive)'''
   def solve(self, points):
-    # Base case - combine # FIXME - FIGURE OUT HOW TO DO IT WITH 1 BASE CASE
-    # if len(points) == 1:  # If just one point, have an array with 1 line pointing to itself
-    #   return [QLineF(points[0], points[0])]
+    # Base case
     if len(points) <= 2:  # If 2 points, have array with 1 line connecting the 2 points
       return points
 
-    # Break up points
+    # Recursive case
     midIdx = len(points) // 2
     leftHull = self.solve(points[:midIdx])	# First half
     rightHull = self.solve(points[midIdx:])	# Second half
