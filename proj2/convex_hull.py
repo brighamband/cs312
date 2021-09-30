@@ -108,9 +108,9 @@ class ConvexHullSolver(QObject):
     polygon = []
     for i in range(len(points)):                                          # O(n)
       if i < len(points) - 1:
-        polygon.append(QLineF(points[i], points[i+1]))
+        polygon.append(QLineF(self.at(points, i), self.at(points, i+1)))
       else:   # On last iteration connect last point to first
-        polygon.append(QLineF(points[i], points[0]))
+        polygon.append(QLineF(self.at(points, i), self.at(points, 0)))
     return polygon
 
   '''
@@ -119,86 +119,72 @@ class ConvexHullSolver(QObject):
   The 1st element in a hull is its leftmost point
   '''
 
-  '''Finds upper tangent of each hull, then returns back indices for the 2 upper tangents.'''
-  def findUpperTangent(self, leftHull, rightHull):
-    # return 0, 0  # TESTING FIXME
+  '''Finds upper/lower tangent of each hull, then returns back indices for the left and right 2 upper/lower tangents.'''
+  def findTangentIndices(self, leftHull, rightHull, findLower):
     # Find rightmost point of left hullleftmost and rightmost points
-    leftHullIdx = self.getRightmostPtIdx(leftHull)
-    rightHullIdx = LEFTMOST_PT_IDX
+    leftCurrIndex = self.getRightmostPtIdx(leftHull)
+    rightCurrIdx = LEFTMOST_PT_IDX
 
-    print('lhi', leftHullIdx)
-    print('rhi', rightHullIdx)
-    
-    currentSlope = self.findSlope(leftHull[leftHullIdx], rightHull[rightHullIdx])
     fullyOptimized = False
 
     while not fullyOptimized:
       fullyOptimized = True
+
+      # Left Side
       
-      leftHullCCWPt = leftHull[leftHullIdx - 1]   # Left hull's next counter-clockwise point
-      
-      print('rh', rightHull)
-      print('here', rightHull[rightHullIdx])
-      tempNextSlope = self.findSlope(rightHull[rightHullIdx], leftHullCCWPt)
-      if tempNextSlope > currentSlope:
+      leftNextIdx = leftCurrIndex - 1 # Left hull's next counter-clockwise index
+      if findLower:
+        leftNextIdx = leftCurrIndex + 1 # Left hull's next clockwise index
+
+      currentSlope = self.findSlope(self.at(rightHull, rightCurrIdx), self.at(leftHull, leftCurrIndex))
+      tempNextSlope = self.findSlope(self.at(rightHull, rightCurrIdx), self.at(leftHull, leftNextIdx))
+
+      isBetter = tempNextSlope < currentSlope
+      if findLower:
+        isBetter = tempNextSlope > currentSlope
+
+      if isBetter:
         currentSlope = tempNextSlope
-        leftHullIdx = leftHullCCWPt
+        leftCurrIndex = leftNextIdx
         fullyOptimized = False
 
-      rightHullCWPt = rightHull[rightHullIdx + 1]   # Right hull's next clockwise point
-      tempNextSlope = self.findSlope(leftHull[leftHullIdx], rightHullCWPt)
-      if tempNextSlope < currentSlope:
+      # Right Side
+
+      rightNextIdx = rightCurrIdx + 1  # Right hull's next clockwise index
+      if findLower:
+        rightNextIdx = rightCurrIdx - 1 # Right hull's next counter-clockwise index
+      
+      currentSlope = self.findSlope(self.at(leftHull, leftCurrIndex), self.at(rightHull, rightCurrIdx))
+      tempNextSlope = self.findSlope(self.at(leftHull, leftCurrIndex), self.at(rightHull, rightNextIdx))
+
+      isBetter = tempNextSlope > currentSlope
+      if findLower:
+        isBetter = tempNextSlope < currentSlope
+        print('ns', tempNextSlope, 'cs', currentSlope)
+
+      if isBetter:
         currentSlope = tempNextSlope
-        rightHullIdx = rightHullCWPt
+        rightCurrIdx = rightNextIdx
         fullyOptimized = False
       
-    return leftHullIdx, rightHullIdx
-
-  def findLowerTangent(self, leftHull, rightHull):
-    return 0, 1   # TESTING
-
-    # leftmost, rightmost = leftHull[0], rightHull[-1]	# Find leftmost and rightmost points
-
-    # temp = line(p,q)
-    # done = 0
-    # while not done:
-    # 	done = 1
-    # 	while temp != is not lower tangent to L:
-    # 		r = p's clockwise neighbor
-    # 		temp = line(r,q)
-    # 		p = r
-    # 		done = 0
-    # 	while temp is not lower tangent to R:
-    # 		r = q's counter-clockwise neighbor
-    # 		temp = line(p,r)
-    # 		q = r
-    # 		done = 0
-    # return temp
+    print('lh', leftHull, 'rh', rightHull, 'lhi', leftCurrIndex, 'rhi', rightCurrIdx)
+    print('curr', currentSlope, 'findLower', findLower)
+    return leftCurrIndex, rightCurrIdx
 
   '''Combines 2 hulls together (returns a list of lines)'''
   def combine(self, leftHull, rightHull):
     # Find upper tangent connecting the hulls
-    leftHUpperIdx, rightHUpperIdx = self.findUpperTangent(leftHull, rightHull)
+    leftHUpperIdx, rightHUpperIdx = self.findTangentIndices(leftHull, rightHull, False)
     # Find lower tangent connecting the hulls
-    leftHLowerIdx, rightHLowerIdx = self.findLowerTangent(leftHull, rightHull)
+    leftHLowerIdx, rightHLowerIdx = self.findTangentIndices(leftHull, rightHull, True)
     # Connect the hulls with the 2 tangent lines
 
-    print('lh', leftHull)
-    print('lh1', leftHull[0])
-    print('rh', rightHull)
-    print('luti', leftHUpperIdx)
-    print('ruti', rightHUpperIdx)
-    print('llti', leftHLowerIdx)
-    print('rlti', rightHLowerIdx)
+    print('vals', leftHUpperIdx, rightHUpperIdx, leftHLowerIdx, rightHLowerIdx)
 
     comboHull = []
     comboHull += self.grabPoints(leftHull, leftHLowerIdx, leftHUpperIdx) # Part of left hull to keep
     comboHull += self.grabPoints(rightHull, rightHUpperIdx, rightHLowerIdx) # Part of right hull to keep
     return comboHull
-
-  '''Calculates the slope of the line connecting 2 points (formula: slope = (y2 - y1) / (x2 - x1))'''
-  # def findSlope(self, point1, point2):
-  #   return (point2.y() - point1.y()) / (point2.x() + point1.x())
 
   '''Finds slope of the line made by connecting the 2 points passed in'''
   def findSlope(self, point1, point2):
