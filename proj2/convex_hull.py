@@ -69,10 +69,14 @@ class ConvexHullSolver(QObject):
     # Sorts the points by increasing x-value
     points.sort(key= lambda k: k.x())	# Overwrites points with same but new order
 
+    print('OP', points)
+
     t3 = time.time()
     polygonPts = self.solve(points)
     polygon = self.toPolygon(polygonPts)
     t4 = time.time()
+
+    print('PP', polygonPts)
 
     self.showTangent(polygon, BLUE);
 
@@ -136,15 +140,15 @@ class ConvexHullSolver(QObject):
       if findLower:
         leftNextIdx = leftCurrIndex + 1 # Left hull's next clockwise index
 
-      currentSlope = self.findSlope(self.at(rightHull, rightCurrIdx), self.at(leftHull, leftCurrIndex))
-      tempNextSlope = self.findSlope(self.at(rightHull, rightCurrIdx), self.at(leftHull, leftNextIdx))
+      currSlope = self.findSlope(self.at(rightHull, rightCurrIdx), self.at(leftHull, leftCurrIndex))
+      nextSlope = self.findSlope(self.at(rightHull, rightCurrIdx), self.at(leftHull, leftNextIdx))
 
-      isBetter = tempNextSlope < currentSlope
+      isBetter = nextSlope < currSlope
       if findLower:
-        isBetter = tempNextSlope > currentSlope
+        isBetter = nextSlope > currSlope
 
       if isBetter:
-        currentSlope = tempNextSlope
+        currSlope = nextSlope
         leftCurrIndex = leftNextIdx
         fullyOptimized = False
 
@@ -154,21 +158,19 @@ class ConvexHullSolver(QObject):
       if findLower:
         rightNextIdx = rightCurrIdx - 1 # Right hull's next counter-clockwise index
       
-      currentSlope = self.findSlope(self.at(leftHull, leftCurrIndex), self.at(rightHull, rightCurrIdx))
-      tempNextSlope = self.findSlope(self.at(leftHull, leftCurrIndex), self.at(rightHull, rightNextIdx))
+      currSlope = self.findSlope(self.at(leftHull, leftCurrIndex), self.at(rightHull, rightCurrIdx))
+      nextSlope = self.findSlope(self.at(leftHull, leftCurrIndex), self.at(rightHull, rightNextIdx))
 
-      isBetter = tempNextSlope > currentSlope
+      isBetter = nextSlope > currSlope
       if findLower:
-        isBetter = tempNextSlope < currentSlope
-        print('ns', tempNextSlope, 'cs', currentSlope)
+        isBetter = nextSlope < currSlope
 
       if isBetter:
-        currentSlope = tempNextSlope
+        currSlope = nextSlope
         rightCurrIdx = rightNextIdx
         fullyOptimized = False
       
-    print('lh', leftHull, 'rh', rightHull, 'lhi', leftCurrIndex, 'rhi', rightCurrIdx)
-    print('curr', currentSlope, 'findLower', findLower)
+    print('curr', currSlope, 'findLower', findLower)
     return leftCurrIndex, rightCurrIdx
 
   '''Combines 2 hulls together (returns a list of lines)'''
@@ -177,13 +179,14 @@ class ConvexHullSolver(QObject):
     leftHUpperIdx, rightHUpperIdx = self.findTangentIndices(leftHull, rightHull, False)
     # Find lower tangent connecting the hulls
     leftHLowerIdx, rightHLowerIdx = self.findTangentIndices(leftHull, rightHull, True)
+    
+    print('lh', leftHull, 'rh', rightHull)
+    print('l👆🏼', leftHUpperIdx, 'r👆🏼', rightHUpperIdx, 'l👇🏼', leftHLowerIdx, 'r👇🏼', rightHLowerIdx)
+
     # Connect the hulls with the 2 tangent lines
-
-    print('vals', leftHUpperIdx, rightHUpperIdx, leftHLowerIdx, rightHLowerIdx)
-
     comboHull = []
-    comboHull += self.grabPoints(leftHull, leftHLowerIdx, leftHUpperIdx) # Part of left hull to keep
-    comboHull += self.grabPoints(rightHull, rightHUpperIdx, rightHLowerIdx) # Part of right hull to keep
+    comboHull = self.addPoints(comboHull, leftHull, leftHLowerIdx, leftHUpperIdx) # Part of left hull to keep
+    comboHull = self.addPoints(comboHull, rightHull, rightHUpperIdx, rightHLowerIdx) # Part of right hull to keep
     return comboHull
 
   '''Finds slope of the line made by connecting the 2 points passed in'''
@@ -195,10 +198,15 @@ class ConvexHullSolver(QObject):
   def at(self, hull, index):
     return hull[index % len(hull)]
 
-  def grabPoints(self, hull, firstPtIdx, lastPtIdx):
-    firstPtIdx = firstPtIdx % len(hull)
-    lastPtIdx = lastPtIdx % len(hull)
-    return hull[firstPtIdx : lastPtIdx + 1]
+  def addPoints(self, newHull, oldHull, firstPtIdx, lastPtIdx):
+    step = 1
+    if firstPtIdx > lastPtIdx:
+      step = -1
+
+    for i in range(firstPtIdx, lastPtIdx + step, step):
+      newHull.append(self.at(oldHull, i))
+
+    return newHull
 
   '''Returns the index of the rightmost point in hull'''
   def getRightmostPtIdx(self, hull):
