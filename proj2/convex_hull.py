@@ -60,19 +60,19 @@ class ConvexHullSolver(QObject):
 
 # This is the method that gets called by the GUI and actually executes
 # the finding of the hull
-  def compute_hull(self, points, pause, view):
+  def compute_hull(self, points, pause, view):                                          # Fn - T O(nlogn) | S(n)
     self.pause = pause
     self.view = view
 
     assert(type(points) == list and type(points[0]) == QPointF)
 
     # Sorts the points by increasing x-value
-    points.sort(key= lambda k: k.x())	# Overwrites points with same but new order
+    points.sort(key= lambda k: k.x())	# Overwrites points with same but new order       # T O(nlogn) - Sorting optimized by Python
 
-    t3 = time.time()
-    polygonPts = self.solve(points)
-    polygon = self.toPolygon(polygonPts)
-    t4 = time.time()
+    t3 = time.time()                                                                    # S O(1)
+    polygonPts = self.solve(points)                                                     # n*logn | S O(n) - See fn, 1 array
+    polygon = self.toPolygon(polygonPts)                                                # T O(n) | S O(1) - See fn
+    t4 = time.time()                                                                    # S O(1)
 
     self.showTangent(polygon, BLUE);
 
@@ -84,35 +84,35 @@ class ConvexHullSolver(QObject):
     polygon = []
 
   '''Divide-and-conquer convex hull solver (recursive)'''
-  def solve(self, points):
+  def solve(self, points):                                                                  # T n*logn | S O(n) - Technically S 3n
     # Base case
     if len(points) <= 2:  # If 2 points, have array with 1 line connecting the 2 points
       return points
 
     # Recursive case
-    midIdx = len(points) // 2
-    leftHull = self.solve(points[:midIdx])	# First half
-    rightHull = self.solve(points[midIdx:])	# Second half
-    return self.combine(leftHull, rightHull)
+    midIdx = len(points) // 2                                                               # O(1) - Big O of n, not N
+    leftHull = self.solve(points[:midIdx])	# First half                                    # T O(logn) | S O(n) - 1 array, recursve
+    rightHull = self.solve(points[midIdx:])	# Second half                                   # T O(logn) | S O(n) - 1 array, recursive
+    return self.combine(leftHull, rightHull)                                                # T(n) | S O(n) - See fn, 1 array
   
   '''Converts array of QPointF points to an array of QLineF lines'''
-  def toPolygon(self, points):                                            # O(n)    
-    polygon = []
-    for i in range(len(points)):                                          # O(n)
+  def toPolygon(self, points):                                                # Fn - T O(n) | S(1)  
+    polygon = []                                                              # S O(1)
+    for i in range(len(points)):                                              # T O(n) - Number of points
       if i < len(points) - 1:
-        polygon.append(QLineF(self.at(points, i), self.at(points, i+1)))
+        polygon.append(QLineF(self.at(points, i), self.at(points, i+1)))      # T O(1) - Appending is constant | S O(n) - need extra space for each n insertion
       else:   # On last iteration connect last point to first
-        polygon.append(QLineF(self.at(points, i), self.at(points, 0)))
+        polygon.append(QLineF(self.at(points, i), self.at(points, 0)))        # T O(1) - Appending is constant | S O(n) - need extra space for each n insertion
     return polygon
 
   '''
-  NOTE
-  Hulls are sorted in cw order
-  The 1st element in a hull is its leftmost point
+    NOTE
+    Hulls are sorted in cw order
+    The 1st element in a hull is its leftmost point
   '''
 
   '''Finds upper/lower tangent of each hull, then returns back indices for the left and right 2 upper/lower tangents.'''
-  def findTangentIndices(self, leftHull, rightHull, findLower):
+  def findTangentIndices(self, leftHull, rightHull, findLower):                                       # Fn - T O(n) | S(1) - Technically T 2n
     # Find rightmost point of left hullleftmost and rightmost points
     leftCurrIndex = self.getRightmostPtIdx(leftHull)                                                  # T O(n) - See fn | S O(1) - 1 int
     rightCurrIdx = LEFTMOST_PT_IDX                                                                    # T O(1) | S O(1) - 1 int
@@ -161,17 +161,17 @@ class ConvexHullSolver(QObject):
     return leftCurrIndex, rightCurrIdx
 
   '''Combines 2 hulls together (returns a list of lines)'''
-  def combine(self, leftHull, rightHull):
+  def combine(self, leftHull, rightHull):                                                             # Fn - T O(n) | O(n) - Technically T 5n, S 3n
     # Find upper tangent connecting the hulls
-    leftUpperIdx, rightUpperIdx = self.findTangentIndices(leftHull, rightHull, False)
+    leftUpperIdx, rightUpperIdx = self.findTangentIndices(leftHull, rightHull, False)                 # T O(n) - See Fn | S(1) - 2 ints 
     # Find lower tangent connecting the hulls
-    leftLowerIdx, rightLowerIdx = self.findTangentIndices(leftHull, rightHull, True)
+    leftLowerIdx, rightLowerIdx = self.findTangentIndices(leftHull, rightHull, True)                  # T O(n) - See Fn | S(1) - 2 ints 
     
     # Combine points together into new hull
-    comboHull = []
-    comboHull = self.addPoints(comboHull, leftHull, LEFTMOST_PT_IDX, leftUpperIdx) # Top part of left hull to keep
-    comboHull = self.addPoints(comboHull, rightHull, rightUpperIdx, rightLowerIdx) # Part of right hull to keep
-    comboHull = self.addLowerLeftPoints(comboHull, leftHull, leftLowerIdx) # Bottom part of left hull to keep
+    comboHull = []                                                                                                          # S(1)
+    comboHull = self.addPoints(comboHull, leftHull, LEFTMOST_PT_IDX, leftUpperIdx) # Top part of left hull to keep          # T O(n), S O(n) - See Fn
+    comboHull = self.addPoints(comboHull, rightHull, rightUpperIdx, rightLowerIdx) # Part of right hull to keep             # T O(n), S O(n) - See Fn
+    comboHull = self.addLowerLeftPoints(comboHull, leftHull, leftLowerIdx) # Bottom part of left hull to keep               # T O(n), S O(n) - See Fn
 
     return comboHull
 
@@ -185,8 +185,8 @@ class ConvexHullSolver(QObject):
     return hull[index % len(hull)]                                        # T O(1) - Access is constant, mod is constant
 
   '''Adds points from an old hull to a new one'''
-  def addPoints(self, newHull, oldHull, currIdx, finalIdx):               # Function - T O(n), S O(n)
-    newHull.append(self.at(oldHull, currIdx))                             # T O(1) - Appending is constant | # S O(1) - just one item added to array
+  def addPoints(self, newHull, oldHull, currIdx, finalIdx):               # Fn - T O(n), S O(n)
+    newHull.append(self.at(oldHull, currIdx))                             # T O(1) - Appending is constant | S O(1) - just one item added to array
     while (currIdx % len(oldHull)) != (finalIdx % len(oldHull)):          # T O(n) - Size of old hull, mod is constant
         currIdx += 1
         newHull.append(self.at(oldHull, currIdx % len(oldHull)))          # T O(1) - Appending is constant, mod is constant | # S O(n) - need extra space for each n insertion
@@ -194,16 +194,16 @@ class ConvexHullSolver(QObject):
     return newHull
 
   '''Handles edge case for adding points to the lower left of a hull'''
-  def addLowerLeftPoints(self, newHull, leftHull, leftLowerIdx):          # Function - T O(n), S O(n)
+  def addLowerLeftPoints(self, newHull, leftHull, leftLowerIdx):          # Fn - T O(n), S O(n)
     if len(leftHull) == 1:                                                # T O(1)
       return newHull
 
     while (leftLowerIdx % len(leftHull)) != LEFTMOST_PT_IDX:                            # T O(n) - Size of left hull
-      newHull.append(self.at(leftHull, leftLowerIdx))                     # T O(1) - Appending is constant | # S O(n) - need extra space for each n insertion
+      newHull.append(self.at(leftHull, leftLowerIdx))                     # T O(1) - Appending is constant | S O(n) - need extra space for each n insertion
       leftLowerIdx += 1
     return newHull
 
   '''Returns the index of the rightmost point in hull'''
-  def getRightmostPtIdx(self, hull):                        # Function - T O(n)
-    biggestXVal = max(hull, key= lambda k: k.x())           # T O(n)? - Depends on Python's implementation | # S O(1) - int
+  def getRightmostPtIdx(self, hull):                        # Fn - T O(n)
+    biggestXVal = max(hull, key= lambda k: k.x())           # T O(n) Worst - Depends on Python's implementation | S O(1) - int
     return hull.index(biggestXVal)                          # T O(1)
