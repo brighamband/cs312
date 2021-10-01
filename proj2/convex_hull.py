@@ -114,12 +114,12 @@ class ConvexHullSolver(QObject):
   '''Finds upper/lower tangent of each hull, then returns back indices for the left and right 2 upper/lower tangents.'''
   def findTangentIndices(self, leftHull, rightHull, findLower):
     # Find rightmost point of left hullleftmost and rightmost points
-    leftCurrIndex = self.getRightmostPtIdx(leftHull)
-    rightCurrIdx = LEFTMOST_PT_IDX
+    leftCurrIndex = self.getRightmostPtIdx(leftHull)                                                  # T O(n) - See fn | S O(1) - 1 int
+    rightCurrIdx = LEFTMOST_PT_IDX                                                                    # T O(1) | S O(1) - 1 int
 
-    fullyOptimized = False
+    fullyOptimized = False                                                                            # T O(1) | S O(1) - 1 boolean
 
-    while not fullyOptimized:
+    while not fullyOptimized:                                                                         # T O(n) - Worst case, looping through top halves of both left (n/2) and right (n/2) hulls
       fullyOptimized = True
 
       # Left Side - finding optimal point
@@ -128,10 +128,10 @@ class ConvexHullSolver(QObject):
       if findLower:
         leftNextIdx = leftCurrIndex + 1 # Left hull's next clockwise index
 
-      currSlope = self.findSlope(self.at(rightHull, rightCurrIdx), self.at(leftHull, leftCurrIndex))
-      nextSlope = self.findSlope(self.at(rightHull, rightCurrIdx), self.at(leftHull, leftNextIdx))
+      currSlope = self.findSlope(self.at(rightHull, rightCurrIdx), self.at(leftHull, leftCurrIndex))  # T O(1) - See fn | S O(1) - 1 float
+      nextSlope = self.findSlope(self.at(rightHull, rightCurrIdx), self.at(leftHull, leftNextIdx))    # T O(1) - See fn | S O(1) - 1 float
 
-      isBetter = nextSlope < currSlope
+      isBetter = nextSlope < currSlope                                                                # T O(1) | S O(1) - 1 boolean
       if findLower:
         isBetter = nextSlope > currSlope
 
@@ -146,10 +146,10 @@ class ConvexHullSolver(QObject):
       if findLower:
         rightNextIdx = rightCurrIdx - 1 # Right hull's next counter-clockwise index
       
-      currSlope = self.findSlope(self.at(leftHull, leftCurrIndex), self.at(rightHull, rightCurrIdx))
-      nextSlope = self.findSlope(self.at(leftHull, leftCurrIndex), self.at(rightHull, rightNextIdx))
+      currSlope = self.findSlope(self.at(leftHull, leftCurrIndex), self.at(rightHull, rightCurrIdx))  # T O(1) - See fn | S O(1) - 1 float
+      nextSlope = self.findSlope(self.at(leftHull, leftCurrIndex), self.at(rightHull, rightNextIdx))  # T O(1) - See fn | S O(1) - 1 float
 
-      isBetter = nextSlope > currSlope
+      isBetter = nextSlope > currSlope                                                                # T O(1)
       if findLower:
         isBetter = nextSlope < currSlope
 
@@ -158,7 +158,7 @@ class ConvexHullSolver(QObject):
         rightCurrIdx = rightNextIdx
         fullyOptimized = False
       
-    return leftCurrIndex % len(leftHull), rightCurrIdx % len(rightHull) # Adjusts indices to be within array
+    return leftCurrIndex, rightCurrIdx
 
   '''Combines 2 hulls together (returns a list of lines)'''
   def combine(self, leftHull, rightHull):
@@ -169,41 +169,41 @@ class ConvexHullSolver(QObject):
     
     # Combine points together into new hull
     comboHull = []
-    comboHull = self.addPoints(comboHull, leftHull, 0, leftUpperIdx) # Top part of left hull to keep
+    comboHull = self.addPoints(comboHull, leftHull, LEFTMOST_PT_IDX, leftUpperIdx) # Top part of left hull to keep
     comboHull = self.addPoints(comboHull, rightHull, rightUpperIdx, rightLowerIdx) # Part of right hull to keep
     comboHull = self.addLowerLeftPoints(comboHull, leftHull, leftLowerIdx) # Bottom part of left hull to keep
 
     return comboHull
 
   '''Finds slope of the line made by connecting the 2 points passed in'''
-  def findSlope(self, point1, point2):
-    line = QLineF(point1, point2)
-    return line.dy() / line.dx()
+  def findSlope(self, point1, point2):                                    # T O(1), S O(1)
+    line = QLineF(point1, point2)                                         # S O(1) - 1 line variable
+    return line.dy() / line.dx()                                          # T O(1) - Typically more expensive, but Python has optimized this
 
   '''Returns index of item in hull (handles logic so that hull can loop circularly).'''
-  def at(self, hull, index):
-    return hull[index % len(hull)]
+  def at(self, hull, index):                                              # T O(1)
+    return hull[index % len(hull)]                                        # T O(1) - Access is constant, mod is constant
 
   '''Adds points from an old hull to a new one'''
-  def addPoints(self, newHull, oldHull, currIdx, finalIdx):
-    newHull.append(self.at(oldHull, currIdx))
-    while (currIdx % len(oldHull)) != (finalIdx % len(oldHull)):
+  def addPoints(self, newHull, oldHull, currIdx, finalIdx):               # Function - T O(n), S O(n)
+    newHull.append(self.at(oldHull, currIdx))                             # T O(1) - Appending is constant | # S O(1) - just one item added to array
+    while (currIdx % len(oldHull)) != (finalIdx % len(oldHull)):          # T O(n) - Size of old hull, mod is constant
         currIdx += 1
-        newHull.append(self.at(oldHull, currIdx % len(oldHull)))
+        newHull.append(self.at(oldHull, currIdx % len(oldHull)))          # T O(1) - Appending is constant, mod is constant | # S O(n) - need extra space for each n insertion
 
     return newHull
 
   '''Handles edge case for adding points to the lower left of a hull'''
-  def addLowerLeftPoints(self, newHull, leftHull, leftLowerIdx):
-    if len(leftHull) == 1:
+  def addLowerLeftPoints(self, newHull, leftHull, leftLowerIdx):          # Function - T O(n), S O(n)
+    if len(leftHull) == 1:                                                # T O(1)
       return newHull
 
-    while (leftLowerIdx % len(leftHull)) != 0:
-      newHull.append(self.at(leftHull, leftLowerIdx))
+    while (leftLowerIdx % len(leftHull)) != LEFTMOST_PT_IDX:                            # T O(n) - Size of left hull
+      newHull.append(self.at(leftHull, leftLowerIdx))                     # T O(1) - Appending is constant | # S O(n) - need extra space for each n insertion
       leftLowerIdx += 1
     return newHull
 
   '''Returns the index of the rightmost point in hull'''
-  def getRightmostPtIdx(self, hull):
-    biggestXVal = max(hull, key= lambda k: k.x())
-    return hull.index(biggestXVal)
+  def getRightmostPtIdx(self, hull):                        # Function - T O(n)
+    biggestXVal = max(hull, key= lambda k: k.x())           # T O(n)? - Depends on Python's implementation | # S O(1) - int
+    return hull.index(biggestXVal)                          # T O(1)
