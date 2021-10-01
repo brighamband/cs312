@@ -69,16 +69,10 @@ class ConvexHullSolver(QObject):
     # Sorts the points by increasing x-value
     points.sort(key= lambda k: k.x())	# Overwrites points with same but new order
 
-    print()
-    print('-----SOLVING NEW HULL-----')
-    print('OP', points)
-
     t3 = time.time()
     polygonPts = self.solve(points)
     polygon = self.toPolygon(polygonPts)
     t4 = time.time()
-
-    print('PP', polygonPts)
 
     self.showTangent(polygon, BLUE);
 
@@ -102,7 +96,7 @@ class ConvexHullSolver(QObject):
     return self.combine(leftHull, rightHull)
   
   '''Converts array of QPointF points to an array of QLineF lines'''
-  def toPolygon(self, points):                                            # O(n)      
+  def toPolygon(self, points):                                            # O(n)    
     polygon = []
     for i in range(len(points)):                                          # O(n)
       if i < len(points) - 1:
@@ -128,7 +122,7 @@ class ConvexHullSolver(QObject):
     while not fullyOptimized:
       fullyOptimized = True
 
-      # Left Side
+      # Left Side - finding optimal point
       
       leftNextIdx = leftCurrIndex - 1 # Left hull's next counter-clockwise index
       if findLower:
@@ -146,7 +140,7 @@ class ConvexHullSolver(QObject):
         leftCurrIndex = leftNextIdx
         fullyOptimized = False
 
-      # Right Side
+      # Right Side - finding optimal point
 
       rightNextIdx = rightCurrIdx + 1  # Right hull's next clockwise index
       if findLower:
@@ -168,20 +162,17 @@ class ConvexHullSolver(QObject):
 
   '''Combines 2 hulls together (returns a list of lines)'''
   def combine(self, leftHull, rightHull):
-    print('---NEW COMBINATION---')
     # Find upper tangent connecting the hulls
-    leftHUpperIdx, rightHUpperIdx = self.findTangentIndices(leftHull, rightHull, False)
+    leftUpperIdx, rightUpperIdx = self.findTangentIndices(leftHull, rightHull, False)
     # Find lower tangent connecting the hulls
-    leftHLowerIdx, rightHLowerIdx = self.findTangentIndices(leftHull, rightHull, True)
+    leftLowerIdx, rightLowerIdx = self.findTangentIndices(leftHull, rightHull, True)
     
-    print('lh', leftHull)
-    print('rh', rightHull)
-    print('l👇🏼', leftHLowerIdx, 'l👆🏼', leftHUpperIdx,  'r👇🏼', rightHLowerIdx, 'r👆🏼', rightHUpperIdx)
-
-    # Connect the hulls with the 2 tangent lines
+    # Combine points together into new hull
     comboHull = []
-    comboHull = self.addPoints(comboHull, leftHull, leftHLowerIdx, leftHUpperIdx) # Part of left hull to keep
-    comboHull = self.addPoints(comboHull, rightHull, rightHUpperIdx, rightHLowerIdx) # Part of right hull to keep
+    comboHull = self.addPoints(comboHull, leftHull, 0, leftUpperIdx) # Top part of left hull to keep
+    comboHull = self.addPoints(comboHull, rightHull, rightUpperIdx, rightLowerIdx) # Part of right hull to keep
+    comboHull = self.addLowerLeftPoints(comboHull, leftHull, leftLowerIdx) # Bottom part of left hull to keep
+
     return comboHull
 
   '''Finds slope of the line made by connecting the 2 points passed in'''
@@ -193,24 +184,23 @@ class ConvexHullSolver(QObject):
   def at(self, hull, index):
     return hull[index % len(hull)]
 
+  '''Adds points from an old hull to a new one'''
   def addPoints(self, newHull, oldHull, currIdx, finalIdx):
-    # Case 1 - finalIdx is equal or bigger
-    if currIdx <= finalIdx:
-      while currIdx <= finalIdx:
-        newHull.append(self.at(oldHull, currIdx))
+    newHull.append(self.at(oldHull, currIdx))
+    while (currIdx % len(oldHull)) != (finalIdx % len(oldHull)):
         currIdx += 1
-      return newHull
-    
-    # Case 2 - currIdx is bigger
-    while currIdx < len(oldHull):   # Get end of hull
-      newHull.append(self.at(oldHull, currIdx))
-      currIdx += 1
-    
-    currIdx = 0
-    while currIdx <= finalIdx:    # After going back to front, get from there to the index
-      newHull.append(self.at(oldHull, currIdx))
-      currIdx += 1
+        newHull.append(self.at(oldHull, currIdx % len(oldHull)))
 
+    return newHull
+
+  '''Handles edge case for adding points to the lower left of a hull'''
+  def addLowerLeftPoints(self, newHull, leftHull, leftLowerIdx):
+    if len(leftHull) == 1:
+      return newHull
+
+    while (leftLowerIdx % len(leftHull)) != 0:
+      newHull.append(self.at(leftHull, leftLowerIdx))
+      leftLowerIdx += 1
     return newHull
 
   '''Returns the index of the rightmost point in hull'''
