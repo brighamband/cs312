@@ -8,37 +8,38 @@ import time
 class Queue:
     queue = []
 
-    def bubble_up():
+    def __bubble_up(self):
         pass
 
-    def sift_down():
+    def __sift_down(self):
         pass
 
-    def min_child():
+    def __min_child(self):
         pass
 
-    # UPDATE
-
-    def delete_min():
+    def delete_min(self):
         pass
 
-    def decrease_key():
+    def decrease_key(self):
         pass
 
-    def insert():
+    def insert(self, item):
         pass
 
 
 class ArrayQueue(Queue):
 
-    def delete_min():
+    def delete_min(self):
+        # loop through items
+        # return item which has highest priority (lowest val)
+        # return min(queue)
         pass
 
-    def decrease_key():
+    def decrease_key(self):
         pass    # Don't have to do anything here for array implementation
 
-    def insert():
-        pass
+    def insert(self, item):
+        self.queue.append(item)
 
 class HeapQueue(Queue):
     pass
