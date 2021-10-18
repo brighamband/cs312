@@ -89,6 +89,10 @@ class NetworkRoutingSolver:
         self.source = srcIndex
         t1 = time.time()
 
+        # Clear arrays each time you start over
+        self.dist.clear()
+        self.prev.clear()
+
         queue = ArrayQueue()
         # queue = HeapQueue() if use_heap else ArrayQueue()   # Sets the right queue implementation based on settings
 
