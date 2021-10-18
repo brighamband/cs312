@@ -3,11 +3,44 @@
 
 from CS312Graph import *
 import time
+import math
 
 
 class Queue:
-    queue = []
+    def __init__( self):
+        self.queue = []
 
+    def delete_min(self):
+        pass
+
+    def decrease_key(self):
+        pass
+
+    def insert(self, item):
+        pass
+
+    def make_queue(self, items):
+        pass
+
+
+class ArrayQueue(Queue):
+    def delete_min(self):
+        highest_priority_item = min(self.queue)
+        self.queue.remove(highest_priority_item)
+        return highest_priority_item
+
+    def decrease_key(self):
+        pass    # Don't have to do anything here for array implementation
+
+    def insert(self, item):
+        self.queue.append(item)
+
+    def make_queue(self, items):
+        for item in items:
+            self.insert(item)
+
+
+class HeapQueue(Queue):
     def __bubble_up(self):
         pass
 
@@ -26,23 +59,8 @@ class Queue:
     def insert(self, item):
         pass
 
-
-class ArrayQueue(Queue):
-
-    def delete_min(self):
-        # loop through items
-        # return item which has highest priority (lowest val)
-        # return min(queue)
+    def make_queue(self, items):
         pass
-
-    def decrease_key(self):
-        pass    # Don't have to do anything here for array implementation
-
-    def insert(self, item):
-        self.queue.append(item)
-
-class HeapQueue(Queue):
-    pass
 
 
 class NetworkRoutingSolver:
@@ -77,6 +95,20 @@ class NetworkRoutingSolver:
         # TODO: RUN DIJKSTRA'S TO DETERMINE SHORTEST PATHS.
         #       ALSO, STORE THE RESULTS FOR THE SUBSEQUENT
         #       CALL TO getShortestPath(dest_index)
+        # print('srcI', srcIndex)
+        print('network', self.network)
+        print('nodes', self.network.nodes)
+
+        queue
+
+        dist = [math.inf] * len(self.network.nodes)
+        prev = [None] * len(self.network.nodes)
+        dist[srcIndex] = 0
+
+        Queue.make_queue(V distances as keys)
+        while len()
+
+
 
         t2 = time.time()
         return (t2-t1)
