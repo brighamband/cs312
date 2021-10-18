@@ -6,24 +6,7 @@ import time
 import math
 
 
-class Queue:
-    def __init__( self):
-        self.queue = []
-
-    def delete_min(self):
-        pass
-
-    def decrease_key(self):
-        pass
-
-    def insert(self, item):
-        pass
-
-    def make_queue(self, items):
-        pass
-
-
-class ArrayQueue(Queue):
+class ArrayQueue():
     def delete_min(self):
         highest_priority_item = min(self.queue)
         self.queue.remove(highest_priority_item)
@@ -40,7 +23,7 @@ class ArrayQueue(Queue):
             self.insert(item)
 
 
-class HeapQueue(Queue):
+class HeapQueue():
     def __bubble_up(self):
         pass
 
@@ -99,7 +82,7 @@ class NetworkRoutingSolver:
         print('network', self.network)
         print('nodes', self.network.nodes)
 
-        queue
+        queue = HeapQueue() if use_heap else ArrayQueue()   # Sets the right queue implementation based on settings
 
         dist = [math.inf] * len(self.network.nodes)
         prev = [None] * len(self.network.nodes)
