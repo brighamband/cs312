@@ -18,6 +18,13 @@ elif PYQT_VER == 'PYQT4':
 else:
 	raise Exception('Unsupported Version of PyQt: {}'.format(PYQT_VER))
 
+### START - JUST ADDED THIS TO MAKE GUI BIGGER ON MY HIGH RESOLUTION SCREEN ###
+if hasattr(Qt, 'AA_EnableHighDpiScaling'):
+    QApplication.setAttribute(Qt.AA_EnableHighDpiScaling, True)
+
+if hasattr(Qt, 'AA_UseHighDpiPixmaps'):
+    QApplication.setAttribute(Qt.AA_UseHighDpiPixmaps, True)
+### END - JUST ADDED THIS TO MAKE GUI BIGGER ON MY HIGH RESOLUTION SCREEN ###
 
 #TODO: Error checking on txt boxes
 #TODO: Color strings

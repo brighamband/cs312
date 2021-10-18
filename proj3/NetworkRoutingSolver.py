@@ -7,7 +7,8 @@ import math
 
 
 class ArrayQueue():
-    queue = []
+    def __init__(self):
+        self.queue = []
 
     def delete_min(self, dist):
         min_dist_idx = 0
@@ -33,7 +34,7 @@ class ArrayQueue():
 
 class HeapQueue():
     def __init__(self):
-        queue = []
+        self.queue = []
 
     def __bubble_up(self):
         pass
@@ -59,8 +60,8 @@ class HeapQueue():
 
 class NetworkRoutingSolver:
     def __init__(self):
-        dist = []
-        prev = []
+        self.dist = []
+        self.prev = []
 
     def initializeNetwork( self, network ):
         assert( type(network) == CS312Graph )
@@ -68,13 +69,11 @@ class NetworkRoutingSolver:
 
     def getShortestPath( self, destIndex ):
         self.dest = destIndex
-        # TODO: RETURN THE SHORTEST PATH FOR destIndex
-        #       INSTEAD OF THE DUMMY SET OF EDGES BELOW
-        #       IT'S JUST AN EXAMPLE OF THE FORMAT YOU'LL 
-        #       NEED TO USE
+        
         path_edges = []
         total_length = 0
         node = self.network.nodes[self.source]
+
         edges_left = 3
         while edges_left > 0:
             edge = node.neighbors[2]
@@ -89,33 +88,27 @@ class NetworkRoutingSolver:
     def computeShortestPaths( self, srcIndex, use_heap=False ):
         self.source = srcIndex
         t1 = time.time()
-        # TODO: RUN DIJKSTRA'S TO DETERMINE SHORTEST PATHS.
-        #       ALSO, STORE THE RESULTS FOR THE SUBSEQUENT
-        #       CALL TO getShortestPath(dest_index)
-
-        # print('network', self.network)
-        # print('nodes', self.network.nodes)
 
         queue = ArrayQueue()
         # queue = HeapQueue() if use_heap else ArrayQueue()   # Sets the right queue implementation based on settings
 
-        dist = [math.inf] * len(self.network.nodes)
-        prev = [None] * len(self.network.nodes)
-        dist[srcIndex] = 0
+        self.dist = [math.inf] * len(self.network.nodes)
+        self.prev = [None] * len(self.network.nodes)
+        self.dist[srcIndex] = 0
 
         queue.make_queue(len(self.network.nodes))
         while len(queue) > 0:
-            curNodeIdx = queue.delete_min(dist)
+            curNodeIdx = queue.delete_min(self.dist)
 
             curKidEdges = self.network.nodes[curNodeIdx].neighbors
 
             for i in range(len(curKidEdges)):
                 destNodeIdx = curKidEdges[i].dest.node_id
 
-                if dist[destNodeIdx] > dist[curNodeIdx] + curKidEdges[i].length:
-                    dist[destNodeIdx] = dist[curNodeIdx] + curKidEdges[i].length
-                    prev[destNodeIdx] = curNodeIdx
-                    queue.decrease_key(destNodeIdx, dist)
+                if self.dist[destNodeIdx] > self.dist[curNodeIdx] + curKidEdges[i].length:
+                    self.dist[destNodeIdx] = self.dist[curNodeIdx] + curKidEdges[i].length
+                    self.prev[destNodeIdx] = curNodeIdx
+                    queue.decrease_key(destNodeIdx, self.dist)
 
         t2 = time.time()
         return (t2-t1)
