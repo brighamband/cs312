@@ -10,7 +10,7 @@ class ArrayQueue():
     def __init__(self):
         self.queue = []
 
-    def delete_min(self, dist):
+    def deleteMin(self, dist):
         min_dist_idx = 0
         for i in self.queue:
             if dist[i] < dist[min_dist_idx]:
@@ -18,14 +18,14 @@ class ArrayQueue():
         del self.queue[min_dist_idx]
         return min_dist_idx
 
-    def decrease_key(self, idx, dist):
+    def decreaseKey(self, idx, dist):
         pass    # Don't have to do anything here for array implementation
 
-    def insert(self, distArrIdx):
-        self.queue.append(distArrIdx)
+    def insert(self, dist_arr_idx):
+        self.queue.append(dist_arr_idx)
 
-    def make_queue(self, numDistArrIndices):
-        for i in range(numDistArrIndices):
+    def makeQueue(self, num_dist_arr_indices):
+        for i in range(num_dist_arr_indices):
             self.insert(i)
     
     def __len__(self):
@@ -45,16 +45,16 @@ class HeapQueue():
     def __min_child(self):
         pass
 
-    def delete_min(self):
+    def deleteMin(self):
         pass
 
-    def decrease_key(self, idx, dist):
+    def decreaseKey(self, idx, dist):
         self.__bubble_up(idx)
 
     def insert(self, item):
         pass
 
-    def make_queue(self, items):
+    def makeQueue(self, items):
         pass
 
 
@@ -100,19 +100,19 @@ class NetworkRoutingSolver:
         self.prev = [None] * len(self.network.nodes)
         self.dist[srcIndex] = 0
 
-        queue.make_queue(len(self.network.nodes))
+        queue.makeQueue(len(self.network.nodes))
         while len(queue) > 0:
-            curNodeIdx = queue.delete_min(self.dist)
+            cur_node_idx = queue.deleteMin(self.dist)
 
-            curKidEdges = self.network.nodes[curNodeIdx].neighbors
+            cur_edges = self.network.nodes[cur_node_idx].neighbors
 
-            for i in range(len(curKidEdges)):
-                destNodeIdx = curKidEdges[i].dest.node_id
+            for i in range(len(cur_edges)):
+                dest_node_idx = cur_edges[i].dest.node_id
 
-                if self.dist[destNodeIdx] > self.dist[curNodeIdx] + curKidEdges[i].length:
-                    self.dist[destNodeIdx] = self.dist[curNodeIdx] + curKidEdges[i].length
-                    self.prev[destNodeIdx] = curNodeIdx
-                    queue.decrease_key(destNodeIdx, self.dist)
+                if self.dist[dest_node_idx] > self.dist[cur_node_idx] + cur_edges[i].length:
+                    self.dist[dest_node_idx] = self.dist[cur_node_idx] + cur_edges[i].length
+                    self.prev[dest_node_idx] = cur_node_idx
+                    queue.decreaseKey(dest_node_idx, self.dist)
 
         t2 = time.time()
         return (t2-t1)
