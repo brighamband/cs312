@@ -43,8 +43,17 @@ class HeapQueue():
     def __sift_down(self):
         pass
 
-    def __min_child(self):
-        pass
+    def __min_child(self, parent_index):
+        return self.__get_left_child(parent_index)
+
+    def __get_parent(self, child_index):
+        return self.queue[(child_index - 1) // 2]
+
+    def __get_left_child(self, parent_index):
+        return self.queue[(parent_index * 2) + 1]
+
+    def __get_right_child(self, parent_index):
+        return self.queue[(parent_index * 2) + 2]
 
     def deleteMin(self):
         pass
@@ -52,11 +61,14 @@ class HeapQueue():
     def decreaseKey(self, idx, dist):
         self.__bubble_up(idx)
 
-    def insert(self, item):
-        pass
+    def insert(self, dist_arr_idx):
+        self.queue.append(dist_arr_idx)
+        self.__bubble_up()
 
-    def makeQueue(self, items):
-        pass
+    def makeQueue(self, num_dist_arr_indices):
+        for i in range(num_dist_arr_indices):
+            self.insert(i)
+        
 
 
 class NetworkRoutingSolver:
