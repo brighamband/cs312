@@ -85,6 +85,7 @@ class HeapQueue(Queue):
     def __bubble_up(self, idx, dist):
         parent_idx = self.__get_parent_idx(idx)
 
+        # Bubble up (rec) if the parent is bigger than the child
         if dist[self.queue[parent_idx]] > dist[self.queue[idx]]:
             self.__swap_values(idx, parent_idx)
             self.__bubble_up(parent_idx, dist)
@@ -92,9 +93,11 @@ class HeapQueue(Queue):
     def __sift_down(self, idx, dist):
         min_child_idx = self.__get_min_child_idx(idx, dist)
         
-        if min_child_idx < 1:
+        # Edge cases
+        if min_child_idx < 1 or min_child_idx > self.__get_last_idx():
             return
 
+        # Sift down (rec) if parent is bigger than the smallest child
         if dist[self.queue[idx]] > dist[self.queue[min_child_idx]]:
             self.__swap_values(idx, min_child_idx)
             self.__sift_down(min_child_idx, dist)
