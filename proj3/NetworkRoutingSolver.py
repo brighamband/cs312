@@ -6,13 +6,27 @@ import time
 import math
 
 
-class ArrayQueue():
+class Queue:
     def __init__(self):
         self.queue = []
 
     def __len__(self):
         return len(self.queue)
 
+    def deleteMin(self, dist):
+        pass
+
+    def decreaseKey(self, idx, dist):
+        pass
+
+    def insert(self, dist_arr_idx, dist):
+        self.queue.append(dist_arr_idx)
+
+    def makeQueue(self, num_dist_arr_indices, dist):
+        for i in range(num_dist_arr_indices):
+            self.insert(i, dist)
+
+class ArrayQueue(Queue):
     def deleteMin(self, dist):
         min_idx = 0     # Index which points to smallest item in dist
         for i in range(len(self.queue)):
@@ -28,18 +42,8 @@ class ArrayQueue():
     def insert(self, dist_arr_idx, dist):
         self.queue.append(dist_arr_idx)
 
-    def makeQueue(self, num_dist_arr_indices, dist):
-        for i in range(num_dist_arr_indices):
-            self.insert(i, dist)
 
-
-class HeapQueue():
-    def __init__(self):
-        self.queue = []
-
-    def __len__(self):
-        return len(self.queue)
-
+class HeapQueue(Queue):
     def __get_parent_idx(self, child_idx):
         return (child_idx - 1) // 2
 
@@ -88,8 +92,8 @@ class HeapQueue():
 
     def deleteMin(self, dist):
         first_val = self.queue[0]
-        self.queue[0] = self.queue[self.__get_last_idx()]    # Replace 1st val with last
-        self.queue.pop()    # Remove last item
+        self.__swap_values(0, self.__get_last_idx())    # Replace 1st val with last
+        self.queue.pop()                                # Remove last item
         self.__sift_down(0, dist)
         return first_val
 
@@ -109,10 +113,6 @@ class HeapQueue():
     def insert(self, dist_arr_idx, dist):
         self.queue.append(dist_arr_idx)
         self.__bubble_up(self.__get_last_idx(), dist)
-
-    def makeQueue(self, num_dist_arr_indices, dist):
-        for i in range(num_dist_arr_indices):
-            self.insert(i, dist)
 
 
 class NetworkRoutingSolver:
@@ -146,9 +146,7 @@ class NetworkRoutingSolver:
         self.dist.clear()
         self.prev.clear()
 
-        # queue = ArrayQueue()
         queue = HeapQueue() if use_heap else ArrayQueue()   # Sets the right queue implementation based on settings
-
 
         self.dist = [math.inf] * len(self.network.nodes)
         self.prev = [None] * len(self.network.nodes)
