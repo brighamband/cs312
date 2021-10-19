@@ -56,7 +56,9 @@ class HeapQueue():
         lc_idx = self.__get_left_child_idx(parent_idx)
         rc_idx = self.__get_right_child_idx(parent_idx)
 
-        print('q', self.queue, 'lc', lc_idx, 'rc', rc_idx)
+        # FIXME - Edge Cases
+        if lc_idx > self.__get_last_idx() or rc_idx > self.__get_last_idx():
+            return -1
 
         if (dist[self.queue[lc_idx]] < dist[self.queue[rc_idx]]):
             return lc_idx
@@ -75,16 +77,33 @@ class HeapQueue():
 
     def __sift_down(self, idx, dist):
         min_child_idx = self.__get_min_child_idx(idx, dist)
+        
+        # FIXME
+        if min_child_idx < 1:
+            return
+
         if dist[self.queue[idx]] > dist[self.queue[min_child_idx]]:
             self.__swap_values(idx, min_child_idx)
             self.__sift_down(min_child_idx, dist)
 
     def deleteMin(self, dist):
+        first_val = self.queue[0]
         self.queue[0] = self.queue[self.__get_last_idx()]    # Replace 1st val with last
         self.queue.pop()    # Remove last item
         self.__sift_down(0, dist)
+        return first_val
 
-    def decreaseKey(self, idx, dist):
+    def decreaseKey(self, node_val, dist):
+        #  FIXME - NEEDS OPTIMIZED - Find index of node
+        idx = 0
+        if len(self.queue) == 0:
+            return
+        while self.queue[idx] != node_val:
+            idx += 1
+            if idx > self.__get_last_idx():
+                return
+        # FIXME
+
         self.__bubble_up(idx, dist)
 
     def insert(self, dist_arr_idx, dist):
@@ -139,14 +158,12 @@ class NetworkRoutingSolver:
         while len(queue) > 0:
             cur_node_idx = queue.deleteMin(self.dist)
 
-            print('qh', queue.queue)
-
             cur_edges = self.network.nodes[cur_node_idx].neighbors
 
             for i in range(len(cur_edges)):
                 dest_node_idx = cur_edges[i].dest.node_id
 
-                if self.dist[dest_node_idx] > self.dist[cur_node_idx] + cur_edges[i].length:
+                if self.dist[cur_node_idx] + cur_edges[i].length < self.dist[dest_node_idx]:
                     self.dist[dest_node_idx] = self.dist[cur_node_idx] + cur_edges[i].length
                     self.prev[dest_node_idx] = cur_edges[i]
                     queue.decreaseKey(dest_node_idx, self.dist)
