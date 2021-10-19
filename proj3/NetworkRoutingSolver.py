@@ -64,7 +64,7 @@ class HeapQueue(Queue):
         lc_idx = self.__get_left_child_idx(parent_idx)
         rc_idx = self.__get_right_child_idx(parent_idx)
 
-        # FIXME - Edge Cases
+        # Edge cases
         if lc_idx > self.__get_last_idx() or rc_idx > self.__get_last_idx():
             return -1
 
@@ -92,7 +92,6 @@ class HeapQueue(Queue):
     def __sift_down(self, idx, dist):
         min_child_idx = self.__get_min_child_idx(idx, dist)
         
-        # FIXME
         if min_child_idx < 1:
             return
 
