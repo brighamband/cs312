@@ -37,39 +37,43 @@ class HeapQueue():
     def __init__(self):
         self.queue = []
 
-    def __bubble_up(self, last_idx, dist):
+    def __get_last_idx(self):
+        return len(self.queue) - 1
+
+    def __bubble_up(self, idx, dist):
         pass
 
-    def __sift_down(self):
+    def __sift_down(self, idx, dist):
         pass
 
     def __min_child(self, parent_idx, dist):
-        left_child = self.__get_left_child(parent_idx)
-        right_child = self.__get_right_child(parent_idx)
+        lc_idx = self.__get_left_child_idx(parent_idx)
+        rc_idx = self.__get_right_child_idx(parent_idx)
 
-        if (dist[self.queue[left_child]] < dist[self.queue[right_child]]):
-            return left_child
-        return right_child
+        if (dist[self.queue[lc_idx]] < dist[self.queue[rc_idx]]):
+            return lc_idx
+        return rc_idx
 
-    def __get_parent(self, child_idx):
+    def __get_parent_idx(self, child_idx):
         return self.queue[(child_idx - 1) // 2]
 
-    def __get_left_child(self, parent_idx):
+    def __get_left_child_idx(self, parent_idx):
         return self.queue[(parent_idx * 2) + 1]
 
-    def __get_right_child(self, parent_idx):
+    def __get_right_child_idx(self, parent_idx):
         return self.queue[(parent_idx * 2) + 2]
 
-    def deleteMin(self):
-        pass
+    def deleteMin(self, dist):
+        self.queue[0] = self.queue[self.__get_last_idx()]    # Replace 1st val with last
+        self.queue.pop()    # Remove last item
+        self.__sift_down(0, dist)
 
     def decreaseKey(self, idx, dist):
         self.__bubble_up(idx, dist)
 
     def insert(self, dist_arr_idx, dist):
         self.queue.append(dist_arr_idx)
-        last_idx = len(self.queue) - 1
-        self.__bubble_up(last_idx, dist)
+        self.__bubble_up(self.__get_last_idx(), dist)
 
     def makeQueue(self, num_dist_arr_indices):
         for i in range(num_dist_arr_indices):
