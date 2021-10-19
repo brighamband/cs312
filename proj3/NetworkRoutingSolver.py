@@ -30,7 +30,7 @@ class ArrayQueue():
 
     def makeQueue(self, num_dist_arr_indices, dist):
         for i in range(num_dist_arr_indices):
-            self.insert(i)
+            self.insert(i, dist)
 
 
 class HeapQueue():
@@ -138,6 +138,8 @@ class NetworkRoutingSolver:
         queue.makeQueue(len(self.network.nodes), self.dist)
         while len(queue) > 0:
             cur_node_idx = queue.deleteMin(self.dist)
+
+            print('qh', queue.queue)
 
             cur_edges = self.network.nodes[cur_node_idx].neighbors
 
