@@ -108,7 +108,7 @@ class NetworkRoutingSolver:
 
                 if self.dist[dest_node_idx] > self.dist[cur_node_idx] + cur_edges[i].length:
                     self.dist[dest_node_idx] = self.dist[cur_node_idx] + cur_edges[i].length
-                    self.prev[dest_node_idx] = cur_edges[i]#cur_node_idx
+                    self.prev[dest_node_idx] = cur_edges[i]
                     queue.decreaseKey(dest_node_idx, self.dist)
 
         t2 = time.time()
