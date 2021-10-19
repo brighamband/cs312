@@ -10,6 +10,9 @@ class ArrayQueue():
     def __init__(self):
         self.queue = []
 
+    def __len__(self):
+        return len(self.queue)
+
     def deleteMin(self, dist):
         min_idx = 0     # Index which points to smallest item in dist
         for i in range(len(self.queue)):
@@ -22,29 +25,29 @@ class ArrayQueue():
     def decreaseKey(self, idx, dist):
         pass    # Don't have to do anything here for array implementation
 
-    def insert(self, dist_arr_idx):
+    def insert(self, dist_arr_idx, dist):
         self.queue.append(dist_arr_idx)
 
-    def makeQueue(self, num_dist_arr_indices):
+    def makeQueue(self, num_dist_arr_indices, dist):
         for i in range(num_dist_arr_indices):
             self.insert(i)
-    
-    def __len__(self):
-        return len(self.queue)
 
 
 class HeapQueue():
     def __init__(self):
         self.queue = []
 
+    def __len__(self):
+        return len(self.queue)
+
     def __get_parent_idx(self, child_idx):
-        return self.queue[(child_idx - 1) // 2]
+        return (child_idx - 1) // 2
 
     def __get_left_child_idx(self, parent_idx):
-        return self.queue[(parent_idx * 2) + 1]
+        return (parent_idx * 2) + 1
 
     def __get_right_child_idx(self, parent_idx):
-        return self.queue[(parent_idx * 2) + 2]
+        return (parent_idx * 2) + 2
 
     def __get_last_idx(self):
         return len(self.queue) - 1
@@ -53,17 +56,28 @@ class HeapQueue():
         lc_idx = self.__get_left_child_idx(parent_idx)
         rc_idx = self.__get_right_child_idx(parent_idx)
 
+        print('q', self.queue, 'lc', lc_idx, 'rc', rc_idx)
+
         if (dist[self.queue[lc_idx]] < dist[self.queue[rc_idx]]):
             return lc_idx
         return rc_idx
 
+    def __swap_values(self, idx1, idx2):
+        temp = self.queue[idx1]
+        self.queue[idx1] = self.queue[idx2]
+        self.queue[idx2] = temp
+
     def __bubble_up(self, idx, dist):
-        if ...:
-            self.__bubble_up(self.__get_parent_idx(idx, dist), dist)
+        parent_idx = self.__get_parent_idx(idx)
+        if dist[self.queue[parent_idx]] > dist[self.queue[idx]]:
+            self.__swap_values(idx, parent_idx)
+            self.__bubble_up(parent_idx, dist)
 
     def __sift_down(self, idx, dist):
-        if ...:
-            self.__sift_down(self.__get_min_child_idx(idx, dist), dist)
+        min_child_idx = self.__get_min_child_idx(idx, dist)
+        if dist[self.queue[idx]] > dist[self.queue[min_child_idx]]:
+            self.__swap_values(idx, min_child_idx)
+            self.__sift_down(min_child_idx, dist)
 
     def deleteMin(self, dist):
         self.queue[0] = self.queue[self.__get_last_idx()]    # Replace 1st val with last
@@ -77,10 +91,9 @@ class HeapQueue():
         self.queue.append(dist_arr_idx)
         self.__bubble_up(self.__get_last_idx(), dist)
 
-    def makeQueue(self, num_dist_arr_indices):
+    def makeQueue(self, num_dist_arr_indices, dist):
         for i in range(num_dist_arr_indices):
-            self.insert(i)
-        
+            self.insert(i, dist)
 
 
 class NetworkRoutingSolver:
@@ -114,15 +127,15 @@ class NetworkRoutingSolver:
         self.dist.clear()
         self.prev.clear()
 
-        queue = ArrayQueue()
-        # queue = HeapQueue() if use_heap else ArrayQueue()   # Sets the right queue implementation based on settings
+        # queue = ArrayQueue()
+        queue = HeapQueue() if use_heap else ArrayQueue()   # Sets the right queue implementation based on settings
 
 
         self.dist = [math.inf] * len(self.network.nodes)
         self.prev = [None] * len(self.network.nodes)
         self.dist[srcIndex] = 0
 
-        queue.makeQueue(len(self.network.nodes))
+        queue.makeQueue(len(self.network.nodes), self.dist)
         while len(queue) > 0:
             cur_node_idx = queue.deleteMin(self.dist)
 
