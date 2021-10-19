@@ -11,12 +11,12 @@ class ArrayQueue():
         self.queue = []
 
     def deleteMin(self, dist):
-        min_dist_idx = 0
-        for i in self.queue:
-            if dist[i] < dist[min_dist_idx]:
-                min_dist_idx = i
-        min_val = self.queue[min_dist_idx]
-        self.queue.remove(min_val)
+        min_idx = 0     # Index which points to smallest item in dist
+        for i in range(len(self.queue)):
+            if dist[self.queue[i]] < dist[self.queue[min_idx]]:     # Compare values in dist that exist in queue
+                min_idx = i
+        min_val = self.queue[min_idx]
+        del self.queue[min_idx]
         return min_val
 
     def decreaseKey(self, idx, dist):
@@ -93,6 +93,7 @@ class NetworkRoutingSolver:
         queue = ArrayQueue()
         # queue = HeapQueue() if use_heap else ArrayQueue()   # Sets the right queue implementation based on settings
 
+
         self.dist = [math.inf] * len(self.network.nodes)
         self.prev = [None] * len(self.network.nodes)
         self.dist[srcIndex] = 0
@@ -101,6 +102,7 @@ class NetworkRoutingSolver:
         while len(queue) > 0:
             cur_node_idx = queue.deleteMin(self.dist)
 
+            print('cur_node_idx', cur_node_idx)
             cur_edges = self.network.nodes[cur_node_idx].neighbors
 
             for i in range(len(cur_edges)):
@@ -110,6 +112,7 @@ class NetworkRoutingSolver:
                     self.dist[dest_node_idx] = self.dist[cur_node_idx] + cur_edges[i].length
                     self.prev[dest_node_idx] = cur_edges[i]
                     queue.decreaseKey(dest_node_idx, self.dist)
+                    print('updated ', cur_edges[i].dest.node_id)
 
         t2 = time.time()
         return (t2-t1)
