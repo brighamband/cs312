@@ -15,8 +15,9 @@ class ArrayQueue():
         for i in self.queue:
             if dist[i] < dist[min_dist_idx]:
                 min_dist_idx = i
-        del self.queue[min_dist_idx]
-        return min_dist_idx
+        min_val = self.queue[min_dist_idx]
+        self.queue.remove(min_val)
+        return min_val
 
     def decreaseKey(self, idx, dist):
         pass    # Don't have to do anything here for array implementation
@@ -71,18 +72,14 @@ class NetworkRoutingSolver:
         self.dest = destIndex
         
         path_edges = []
-        total_length = 0
-        node = self.network.nodes[self.source]
 
-        edges_left = 3
-        while edges_left > 0:
-            edge = node.neighbors[2]
-            path_edges.append( (edge.src.loc, edge.dest.loc, '{:.0f}'.format(edge.length)) )
-            total_length += edge.length
-            node = edge.dest
-            edges_left -= 1
+        cur_edge = self.prev[self.dest] # Start with last edge
 
-        return {'cost':total_length, 'path':path_edges}
+        while cur_edge: # Work backwards
+            path_edges.append( (cur_edge.src.loc, cur_edge.dest.loc, '{:.0f}'.format(cur_edge.length)) )
+            cur_edge = self.prev[cur_edge.src.node_id]
+
+        return {'cost':self.dist[self.dest], 'path':path_edges}
 
 
     def computeShortestPaths( self, srcIndex, use_heap=False ):
@@ -111,7 +108,7 @@ class NetworkRoutingSolver:
 
                 if self.dist[dest_node_idx] > self.dist[cur_node_idx] + cur_edges[i].length:
                     self.dist[dest_node_idx] = self.dist[cur_node_idx] + cur_edges[i].length
-                    self.prev[dest_node_idx] = cur_node_idx
+                    self.prev[dest_node_idx] = cur_edges[i]#cur_node_idx
                     queue.decreaseKey(dest_node_idx, self.dist)
 
         t2 = time.time()
