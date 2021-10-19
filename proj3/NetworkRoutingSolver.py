@@ -19,8 +19,8 @@ class Queue:
     def decreaseKey(self, idx, dist):
         pass
 
-    def insert(self, dist_arr_idx, dist):                                                               # Fn - T O(1), appending is constant - S O(1), adds one item to array
-        self.queue.append(dist_arr_idx)
+    def insert(self, dist_arr_idx, dist):
+        pass
 
     def makeQueue(self, num_dist_arr_indices, dist):                                                    # Fn - T O(|V|), 
         for i in range(num_dist_arr_indices):
@@ -39,7 +39,7 @@ class ArrayQueue(Queue):
     def decreaseKey(self, idx, dist):                                                                   # Fn - T O(1) - S O(1)
         pass    # Don't have to do anything here for array implementation
 
-    def insert(self, dist_arr_idx, dist):                                                               # Fn - T O(1), appending is constant - S O(1), adds one more item
+    def insert(self, dist_arr_idx, dist):                                                               # Fn - T O(1), appending is constant - S O(1), adds one item to array
         self.queue.append(dist_arr_idx)
 
 
