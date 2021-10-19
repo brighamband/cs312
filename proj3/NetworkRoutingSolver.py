@@ -44,6 +44,10 @@ class ArrayQueue(Queue):
 
 
 class HeapQueue(Queue):
+    def __init__(self):
+        super().__init__()
+        self.map = []   # Says where to find nodes in the queue
+
     def __get_parent_idx(self, child_idx):
         return (child_idx - 1) // 2
 
@@ -69,12 +73,18 @@ class HeapQueue(Queue):
         return rc_idx
 
     def __swap_values(self, idx1, idx2):
+        # Swap queue values
         temp = self.queue[idx1]
         self.queue[idx1] = self.queue[idx2]
         self.queue[idx2] = temp
+        # Swap map values
+        temp = self.map[self.queue[idx1]]
+        self.map[self.queue[idx1]] = self.map[self.queue[idx2]]
+        self.map[self.queue[idx2]] = temp
 
     def __bubble_up(self, idx, dist):
         parent_idx = self.__get_parent_idx(idx)
+
         if dist[self.queue[parent_idx]] > dist[self.queue[idx]]:
             self.__swap_values(idx, parent_idx)
             self.__bubble_up(parent_idx, dist)
@@ -92,26 +102,19 @@ class HeapQueue(Queue):
 
     def deleteMin(self, dist):
         first_val = self.queue[0]
-        self.__swap_values(0, self.__get_last_idx())    # Replace 1st val with last
+        self.queue[0] = self.queue[self.__get_last_idx()]   # Replace 1st val with last
+        self.map[self.queue[0]] = 0
         self.queue.pop()                                # Remove last item
         self.__sift_down(0, dist)
         return first_val
 
     def decreaseKey(self, node_val, dist):
-        #  FIXME - NEEDS OPTIMIZED - Find index of node
-        idx = 0
-        if len(self.queue) == 0:
-            return
-        while self.queue[idx] != node_val:
-            idx += 1
-            if idx > self.__get_last_idx():
-                return
-        # FIXME
-
+        idx = self.map[node_val]
         self.__bubble_up(idx, dist)
 
     def insert(self, dist_arr_idx, dist):
         self.queue.append(dist_arr_idx)
+        self.map.append(dist_arr_idx)
         self.__bubble_up(self.__get_last_idx(), dist)
 
 
