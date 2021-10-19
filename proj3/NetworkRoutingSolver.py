@@ -37,23 +37,6 @@ class HeapQueue():
     def __init__(self):
         self.queue = []
 
-    def __get_last_idx(self):
-        return len(self.queue) - 1
-
-    def __bubble_up(self, idx, dist):
-        pass
-
-    def __sift_down(self, idx, dist):
-        pass
-
-    def __min_child(self, parent_idx, dist):
-        lc_idx = self.__get_left_child_idx(parent_idx)
-        rc_idx = self.__get_right_child_idx(parent_idx)
-
-        if (dist[self.queue[lc_idx]] < dist[self.queue[rc_idx]]):
-            return lc_idx
-        return rc_idx
-
     def __get_parent_idx(self, child_idx):
         return self.queue[(child_idx - 1) // 2]
 
@@ -62,6 +45,25 @@ class HeapQueue():
 
     def __get_right_child_idx(self, parent_idx):
         return self.queue[(parent_idx * 2) + 2]
+
+    def __get_last_idx(self):
+        return len(self.queue) - 1
+
+    def __get_min_child_idx(self, parent_idx, dist):
+        lc_idx = self.__get_left_child_idx(parent_idx)
+        rc_idx = self.__get_right_child_idx(parent_idx)
+
+        if (dist[self.queue[lc_idx]] < dist[self.queue[rc_idx]]):
+            return lc_idx
+        return rc_idx
+
+    def __bubble_up(self, idx, dist):
+        if ...:
+            self.__bubble_up(self.__get_parent_idx(idx, dist), dist)
+
+    def __sift_down(self, idx, dist):
+        if ...:
+            self.__sift_down(self.__get_min_child_idx(idx, dist), dist)
 
     def deleteMin(self, dist):
         self.queue[0] = self.queue[self.__get_last_idx()]    # Replace 1st val with last
@@ -124,7 +126,6 @@ class NetworkRoutingSolver:
         while len(queue) > 0:
             cur_node_idx = queue.deleteMin(self.dist)
 
-            print('cur_node_idx', cur_node_idx)
             cur_edges = self.network.nodes[cur_node_idx].neighbors
 
             for i in range(len(cur_edges)):
@@ -134,7 +135,6 @@ class NetworkRoutingSolver:
                     self.dist[dest_node_idx] = self.dist[cur_node_idx] + cur_edges[i].length
                     self.prev[dest_node_idx] = cur_edges[i]
                     queue.decreaseKey(dest_node_idx, self.dist)
-                    print('updated ', cur_edges[i].dest.node_id)
 
         t2 = time.time()
         return (t2-t1)
