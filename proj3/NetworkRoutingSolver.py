@@ -49,6 +49,8 @@ class HeapQueue(Queue):
         self.map = []   # Says where to find nodes in the queue
 
     def __get_parent_idx(self, child_idx):
+        if child_idx <= 2:
+            return 0
         return (child_idx - 1) // 2
 
     def __get_left_child_idx(self, parent_idx):
@@ -90,6 +92,7 @@ class HeapQueue(Queue):
             self.__swap_values(idx, parent_idx)
             self.__bubble_up(parent_idx, dist)
 
+
     def __sift_down(self, idx, dist):                                                                   # Fn - T O(log|V|), worst amount of recursive calls - S O(1), makes 1 int
         min_child_idx = self.__get_min_child_idx(idx, dist)
         
@@ -101,6 +104,7 @@ class HeapQueue(Queue):
         if dist[self.queue[idx]] > dist[self.queue[min_child_idx]]:
             self.__swap_values(idx, min_child_idx)
             self.__sift_down(min_child_idx, dist)
+        
 
     def deleteMin(self, dist):                                                                          # Fn - T O(log|V|), calls sift down - S O(1), just stores an int
         first_val = self.queue[0]   
