@@ -34,6 +34,12 @@ class GeneSequencing:
     def __init__(self):
         pass
 
+    def charCheck(self, char1, char2):
+        """Checks to see if two characters match, then returns the appropriate reward/cost accordingly."""
+        if char1 == char2:
+            return MATCH
+        return SUB
+
     def solve_unbanded(self, seq1, seq2, max_chars_to_align):
         # Cut down sequences to be max character length
         if len(seq1) > max_chars_to_align:
@@ -46,6 +52,7 @@ class GeneSequencing:
         num_cols = len(seq2) + 1  # Need +1 to account for empty string
 
         # Initialize valTable
+
         valTable = [
             [0 for i in range(num_cols)] for j in range(num_rows)
         ]  # Table that holds edit distance values
@@ -61,7 +68,19 @@ class GeneSequencing:
             [Arrow.NONE for i in range(num_cols)] for j in range(num_rows)
         ]  # Table that holds back pointers
 
+        # Fill valTable (start at [1,1])
+        for i in range(1, num_rows):
+            for j in range(1, num_cols):
+                left_ins_cost = INDEL + valTable[i, j - 1]
+                diag_sub_cost = (
+                    self.charCheck(seq1[i - 1], seq2[j - 1]) + valTable[i - 1][j - 1]
+                )  # Checks current chars for a match, adds that to diagonal value
+                up_del_cost = INDEL + valTable[i - 1, j]
+
+                valTable[i][j] = min([left_ins_cost, diag_sub_cost, up_del_cost])
+
         score = 0
+        print("vt", valTable)
 
         return score, valTable, backTable
 
