@@ -114,11 +114,17 @@ class GeneSequencing:
             seq1, seq2, val_table, back_table, num_rows, num_cols
         )
 
-        back_ptr = back_table[num_rows][num_cols]  # Start at last cell (bottom right)
-        score = 0
+        # Figure out score (it will be the value in the bottom right corner of the value table)
+        score = val_table[num_rows, num_cols]
 
-        while back_ptr != Arrow.START:
-            score += back_ptr
+        # Build strings
+
+        # back_ptr = back_table[num_rows][num_cols]  # Start at last cell (bottom right)
+        # seq1_str = ''
+        # seq2_str = ''
+
+        # while back_ptr != Arrow.START:
+        #     if
 
         # Move back_ptr
 
