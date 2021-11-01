@@ -119,12 +119,28 @@ class GeneSequencing:
 
         # Build strings
 
-        # back_ptr = back_table[num_rows][num_cols]  # Start at last cell (bottom right)
-        # seq1_str = ''
-        # seq2_str = ''
+        back_ptr = back_table[num_rows][num_cols]  # Start at last cell (bottom right)
+        cur_row = num_rows
+        cur_col = num_cols
+        alignment1 = ""
+        alignment2 = ""
 
-        # while back_ptr != Arrow.START:
-        #     if
+        while back_ptr != Arrow.START:
+            if back_ptr == Arrow.LEFT:
+                # FIXME BELOW
+                alignment2 = seq1[cur_row - 1] + alignment2
+                alignment2 = "-" + alignment2
+                cur_col -= 1
+            if back_ptr == Arrow.DIAG:
+                # FIXME BELOW
+                alignment1 = val_table[cur_row][cur_col] + alignment1
+                alignment2 = val_table[cur_row][cur_col] + alignment2
+
+                cur_row -= 1
+                cur_col -= 1
+            if back_ptr == Arrow.UP:
+                # FIXME
+                cur_row -= 1
 
         # Move back_ptr
 
