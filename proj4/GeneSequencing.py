@@ -61,10 +61,9 @@ class GeneSequencing:
             [Arrow.NONE for i in range(num_cols)] for j in range(num_rows)
         ]  # Table that holds back pointers
 
-        print(valTable)
-        # print("NEXT -----------------")
-        pass
-        # return values and backpointers
+        score = 0
+
+        return score, valTable, backTable
 
     def solve_banded(self):
         pass
@@ -80,10 +79,11 @@ class GeneSequencing:
 
         ###################################################################################################
         # your code should replace these three statements and populate the three variables: score, alignment1 and alignment2
-        if not banded:
-            self.solve_unbanded(seq1, seq2, self.max_chars_to_align)
-        else:
-            self.solve_banded()
+
+        # if not banded:
+        self.solve_unbanded(seq1, seq2, self.max_chars_to_align)
+        # else:
+        #     self.solve_banded()
 
         score = random.random() * 100
         alignment1 = "abc-easy  DEBUG:({} chars,align_len={}{})".format(
