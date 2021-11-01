@@ -22,23 +22,80 @@ MATCH = -3
 INDEL = 5
 SUB = 1
 
-# Enum for values in backTable since it only stores ints
+# Enum for values in back_table since it only stores ints
 class Arrow(Enum):
     NONE = 0  # Current cell doesn't have value
-    LEFT = 1  # Current cell got its value from the left cell
-    DIAG = 2  # Current cell got its value from the diagonal cell
-    UP = 3  # Current cell got its value from the cell above it
+    START = 1  # Starting cell (useful when finding path back to it)
+    LEFT = 2  # Current cell got its value from the left cell
+    DIAG = 3  # Current cell got its value from the diagonal cell
+    UP = 4  # Current cell got its value from the cell above it
 
 
 class GeneSequencing:
     def __init__(self):
         pass
 
-    def charCheck(self, char1, char2):
+    def init_tables(self, num_rows, num_cols):
+        """Initializes the value and back pointer tables (0s everywhere, except the value table has i in the first row and col."""
+
+        # Initialize val_table
+
+        val_table = [
+            [0 for i in range(num_cols)] for j in range(num_rows)
+        ]  # Table that holds edit distance values
+
+        for i in range(num_rows):
+            val_table[i][0] = i  # Initialize first col of each row to be i
+
+            for j in range(num_cols):
+                val_table[0][j] = j  # Initialize first row of each col to be j
+
+        # Initialize back_table
+
+        back_table = [
+            [Arrow.NONE for i in range(num_cols)] for j in range(num_rows)
+        ]  # Table that holds back pointers
+
+        back_table[0][0] = Arrow.START  # Make sure start has its own value
+
+        return val_table, back_table
+
+    def compare_chars(self, char1, char2):
         """Checks to see if two characters match, then returns the appropriate reward/cost accordingly."""
         if char1 == char2:
             return MATCH
         return SUB
+
+    def fill_tables(self, seq1, seq2, val_table, back_table, num_rows, num_cols):
+        """Starting at [1,1], fill out the dynamic programming tables that hold values and back pointers."""
+
+        for i in range(1, num_rows):
+            for j in range(1, num_cols):
+                left_ins_cost = INDEL + val_table[i][j - 1]
+                diag_sub_cost = (
+                    self.compare_chars(seq1[i - 1], seq2[j - 1])
+                    + val_table[i - 1][j - 1]
+                )  # Checks current chars for a match, adds that to diagonal value
+                up_del_cost = INDEL + val_table[i - 1][j]
+
+                # Figure out smallest cost
+
+                # Left first - first tiebreaker
+                if left_ins_cost <= diag_sub_cost and left_ins_cost <= up_del_cost:
+                    val_table[i][j] = left_ins_cost
+                    back_table[i][j] = Arrow.LEFT
+
+                # Up second - second tiebreaker
+                elif up_del_cost <= left_ins_cost and up_del_cost <= diag_sub_cost:
+                    val_table[i][j] = up_del_cost
+                    back_table[i][j] = Arrow.UP
+
+                # 3rd case - diagonal
+                else:
+                    back_table[i][j] = Arrow.DIAG
+                    val_table[i][j] = diag_sub_cost
+
+        return val_table, back_table
 
     def solve_unbanded(self, seq1, seq2, max_chars_to_align):
         # Cut down sequences to be max character length
@@ -51,38 +108,21 @@ class GeneSequencing:
         num_rows = len(seq1) + 1  # Need +1 to account for empty string
         num_cols = len(seq2) + 1  # Need +1 to account for empty string
 
-        # Initialize valTable
+        val_table, back_table = self.init_tables(num_rows, num_cols)
 
-        valTable = [
-            [0 for i in range(num_cols)] for j in range(num_rows)
-        ]  # Table that holds edit distance values
+        val_table, back_table = self.fill_tables(
+            seq1, seq2, val_table, back_table, num_rows, num_cols
+        )
 
-        for i in range(num_rows):
-            valTable[i][0] = i  # Initialize first col of each row to be i
-
-            for j in range(num_cols):
-                valTable[0][j] = j  # Initialize first row of each col to be j
-
-        # Initialize backTable
-        backTable = [
-            [Arrow.NONE for i in range(num_cols)] for j in range(num_rows)
-        ]  # Table that holds back pointers
-
-        # Fill valTable (start at [1,1])
-        for i in range(1, num_rows):
-            for j in range(1, num_cols):
-                left_ins_cost = INDEL + valTable[i, j - 1]
-                diag_sub_cost = (
-                    self.charCheck(seq1[i - 1], seq2[j - 1]) + valTable[i - 1][j - 1]
-                )  # Checks current chars for a match, adds that to diagonal value
-                up_del_cost = INDEL + valTable[i - 1, j]
-
-                valTable[i][j] = min([left_ins_cost, diag_sub_cost, up_del_cost])
-
+        back_ptr = back_table[num_rows][num_cols]  # Start at last cell (bottom right)
         score = 0
-        print("vt", valTable)
 
-        return score, valTable, backTable
+        while back_ptr != Arrow.START:
+            score += back_ptr
+
+        # Move back_ptr
+
+        return score, val_table, back_table
 
     def solve_banded(self):
         pass
