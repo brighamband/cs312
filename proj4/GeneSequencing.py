@@ -18,12 +18,13 @@ import random
 MAXINDELS = 3
 
 # Used to implement Needleman-Wunsch scoring
-# MATCH = -3
-# INDEL = 5
-# SUB = 1
-MATCH = 0
-INDEL = 1
+MATCH = -3
+INDEL = 5
 SUB = 1
+# BELOW WAS FIRST TESTING THARS AND OTHER FROM SLIDES
+# MATCH = 0
+# INDEL = 1
+# SUB = 1
 
 # Enum for values in back_table since it only stores ints
 class Arrow(Enum):
