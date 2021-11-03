@@ -129,7 +129,7 @@ class GeneSequencing:
         while back_ptr != Arrow.START:
             if back_ptr == Arrow.LEFT:
                 # Replace seq1 letter with a dash
-                alignment1 = "-" + seq1[cur_row - 1] + alignment2
+                alignment1 = "-" + alignment1
                 # Keep seq2 letter
                 alignment2 = seq2[cur_col - 1] + alignment2
                 # Move left 1
@@ -149,8 +149,6 @@ class GeneSequencing:
                 alignment2 = "-" + alignment2
                 # Move up 1
                 cur_row -= 1
-            else:
-                break
 
             # Move the back_ptr
             back_ptr = back_table[cur_row][cur_col]
