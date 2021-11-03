@@ -126,8 +126,6 @@ class GeneSequencing:
         alignment1 = ""
         alignment2 = ""
 
-        print("s1", seq1, "s2", seq2)
-
         while back_ptr != Arrow.START:
             if back_ptr == Arrow.LEFT:
                 # Replace seq1 letter with a dash
@@ -156,16 +154,6 @@ class GeneSequencing:
 
             # Move the back_ptr
             back_ptr = back_table[cur_row][cur_col]
-
-        print("a1", alignment1, "a2", alignment2)
-        print()
-        #         cur_row -= 1
-        #         cur_col -= 1
-        #     if back_ptr == Arrow.UP:
-        #         # FIXME
-        #         cur_row -= 1
-
-        # Move back_ptr
 
         return score, alignment1, alignment2
 
