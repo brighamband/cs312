@@ -18,8 +18,11 @@ import random
 MAXINDELS = 3
 
 # Used to implement Needleman-Wunsch scoring
-MATCH = -3
-INDEL = 5
+# MATCH = -3
+# INDEL = 5
+# SUB = 1
+MATCH = 0
+INDEL = 1
 SUB = 1
 
 # Enum for values in back_table since it only stores ints
@@ -38,23 +41,21 @@ class GeneSequencing:
     def init_tables(self, num_rows, num_cols):
         """Initializes the value and back pointer tables (0s everywhere, except the value table has i in the first row and col."""
 
-        # Initialize val_table
-
         val_table = [
             [0 for i in range(num_cols)] for j in range(num_rows)
         ]  # Table that holds edit distance values
 
-        for i in range(num_rows):
-            val_table[i][0] = i  # Initialize first col of each row to be i
-
-            for j in range(num_cols):
-                val_table[0][j] = j  # Initialize first row of each col to be j
-
-        # Initialize back_table
-
         back_table = [
             [Arrow.NONE for i in range(num_cols)] for j in range(num_rows)
         ]  # Table that holds back pointers
+
+        for i in range(num_rows):
+            val_table[i][0] = i  # Initialize first col of each row to be i
+            back_table[i][0] = Arrow.UP  # Make up back pointers across left col
+
+            for j in range(num_cols):
+                val_table[0][j] = j  # Initialize first row of each col to be j
+                back_table[0][j] = Arrow.LEFT  # Make left back pointers across top row
 
         back_table[0][0] = Arrow.START  # Make sure start has its own value
 
@@ -115,40 +116,63 @@ class GeneSequencing:
         )
 
         # Figure out score (it will be the value in the bottom right corner of the value table)
-        score = val_table[num_rows, num_cols]
+        score = val_table[num_rows - 1][num_cols - 1]
 
         # Build strings
 
-        back_ptr = back_table[num_rows][num_cols]  # Start at last cell (bottom right)
-        cur_row = num_rows
-        cur_col = num_cols
+        cur_row = num_rows - 1
+        cur_col = num_cols - 1
+        back_ptr = back_table[cur_row][cur_col]  # Start at last cell (bottom right)
         alignment1 = ""
         alignment2 = ""
 
+        print("s1", seq1, "s2", seq2)
+
         while back_ptr != Arrow.START:
             if back_ptr == Arrow.LEFT:
-                # FIXME BELOW
-                alignment2 = seq1[cur_row - 1] + alignment2
+                # Replace seq1 letter with a dash
+                alignment1 = "-" + seq1[cur_row - 1] + alignment2
+                # Keep seq2 letter
+                alignment2 = seq2[cur_col - 1] + alignment2
+                # Move left 1
+                cur_col -= 1
+            elif back_ptr == Arrow.DIAG:
+                # Keep seq1 letter
+                alignment1 = seq1[cur_row - 1] + alignment1
+                # Keep seq2 letter
+                alignment2 = seq2[cur_col - 1] + alignment2
+                # Move up 1, left 1
+                cur_row -= 1
+                cur_col -= 1
+            elif back_ptr == Arrow.UP:
+                # Keep seq1 letter
+                alignment1 = seq1[cur_row - 1] + alignment1
+                # Replace seq2 letter with a dash
                 alignment2 = "-" + alignment2
-                cur_col -= 1
-            if back_ptr == Arrow.DIAG:
-                # FIXME BELOW
-                alignment1 = val_table[cur_row][cur_col] + alignment1
-                alignment2 = val_table[cur_row][cur_col] + alignment2
+                # Move up 1
+                cur_row -= 1
+            else:
+                break
 
-                cur_row -= 1
-                cur_col -= 1
-            if back_ptr == Arrow.UP:
-                # FIXME
-                cur_row -= 1
+            # Move the back_ptr
+            back_ptr = back_table[cur_row][cur_col]
+
+        print("a1", alignment1, "a2", alignment2)
+        print()
+        #         cur_row -= 1
+        #         cur_col -= 1
+        #     if back_ptr == Arrow.UP:
+        #         # FIXME
+        #         cur_row -= 1
 
         # Move back_ptr
 
-        return score, val_table, back_table
+        return score, alignment1, alignment2
 
     def solve_banded(self):
         pass
         # return values and backpointers
+        # return score, val_table, back_table
 
     # This is the method called by the GUI.  _seq1_ and _seq2_ are two sequences to be aligned, _banded_ is a boolean that tells
     # you whether you should compute a banded alignment or full alignment, and _align_length_ tells you
@@ -162,17 +186,19 @@ class GeneSequencing:
         # your code should replace these three statements and populate the three variables: score, alignment1 and alignment2
 
         # if not banded:
-        self.solve_unbanded(seq1, seq2, self.max_chars_to_align)
+        score, alignment1, alignment2 = self.solve_unbanded(
+            seq1, seq2, self.max_chars_to_align
+        )
         # else:
         #     self.solve_banded()
 
-        score = random.random() * 100
-        alignment1 = "abc-easy  DEBUG:({} chars,align_len={}{})".format(
-            len(seq1), align_length, ",BANDED" if banded else ""
-        )
-        alignment2 = "as-123--  DEBUG:({} chars,align_len={}{})".format(
-            len(seq2), align_length, ",BANDED" if banded else ""
-        )
+        # score = random.random() * 100
+        # alignment1 = "abc-easy  DEBUG:({} chars,align_len={}{})".format(
+        #     len(seq1), align_length, ",BANDED" if banded else ""
+        # )
+        # alignment2 = "as-123--  DEBUG:({} chars,align_len={}{})".format(
+        #     len(seq2), align_length, ",BANDED" if banded else ""
+        # )
         ###################################################################################################
 
         return {
