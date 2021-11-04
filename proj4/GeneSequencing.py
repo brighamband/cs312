@@ -99,28 +99,7 @@ class GeneSequencing:
 
         return val_table, back_table
 
-    def solve_unbanded(self, seq1, seq2, max_chars_to_align):
-        # Cut down sequences to be max character length
-        if len(seq1) > max_chars_to_align:
-            seq1 = seq1[:max_chars_to_align]
-        if len(seq2) > max_chars_to_align:
-            seq2 = seq2[:max_chars_to_align]
-
-        # Initialize 2D arrays
-        num_rows = len(seq1) + 1  # Need +1 to account for empty string
-        num_cols = len(seq2) + 1  # Need +1 to account for empty string
-
-        val_table, back_table = self.init_tables(num_rows, num_cols)
-
-        val_table, back_table = self.fill_tables(
-            seq1, seq2, val_table, back_table, num_rows, num_cols
-        )
-
-        # Figure out score (it will be the value in the bottom right corner of the value table)
-        score = val_table[num_rows - 1][num_cols - 1]
-
-        # Build strings
-
+    def find_alignments(self, seq1, seq2, back_table, num_rows, num_cols):
         cur_row = num_rows - 1
         cur_col = num_cols - 1
         back_ptr = back_table[cur_row][cur_col]  # Start at last cell (bottom right)
@@ -153,6 +132,32 @@ class GeneSequencing:
 
             # Move the back_ptr
             back_ptr = back_table[cur_row][cur_col]
+
+        return alignment1, alignment2
+
+    def solve_unbanded(self, seq1, seq2, max_chars_to_align):
+        # Cut down sequences to be max character length
+        if len(seq1) > max_chars_to_align:
+            seq1 = seq1[:max_chars_to_align]
+        if len(seq2) > max_chars_to_align:
+            seq2 = seq2[:max_chars_to_align]
+
+        # Initialize 2D arrays
+        num_rows = len(seq1) + 1  # Need +1 to account for empty string
+        num_cols = len(seq2) + 1  # Need +1 to account for empty string
+
+        val_table, back_table = self.init_tables(num_rows, num_cols)
+
+        val_table, back_table = self.fill_tables(
+            seq1, seq2, val_table, back_table, num_rows, num_cols
+        )
+
+        # Figure out score (it will be the value in the bottom right corner of the value table)
+        score = val_table[num_rows - 1][num_cols - 1]
+
+        alignment1, alignment2 = self.find_alignments(
+            seq1, seq2, back_table, num_rows, num_cols
+        )
 
         return score, alignment1, alignment2
 
