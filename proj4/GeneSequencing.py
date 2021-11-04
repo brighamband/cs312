@@ -90,7 +90,7 @@ class GeneSequencing:
                     back_table[i][j] = Arrow.LEFT
 
                 # Up second - second tiebreaker
-                elif up_del_cost <= left_ins_cost and up_del_cost <= diag_sub_cost:
+                elif up_del_cost < left_ins_cost and up_del_cost <= diag_sub_cost:
                     val_table[i][j] = up_del_cost
                     back_table[i][j] = Arrow.UP
 
@@ -137,12 +137,7 @@ class GeneSequencing:
 
         return alignment1, alignment2
 
-    def solve_unbanded(self, seq1, seq2, max_chars_to_align):
-        # Cut down sequences to be max character length
-        if len(seq1) > max_chars_to_align:
-            seq1 = seq1[:max_chars_to_align]
-        if len(seq2) > max_chars_to_align:
-            seq2 = seq2[:max_chars_to_align]
+    def solve_unbanded(self, seq1, seq2):
 
         # Initialize 2D arrays
         num_rows = len(seq1) + 1  # Need +1 to account for empty string
@@ -176,15 +171,22 @@ class GeneSequencing:
         self.banded = banded
         self.max_chars_to_align = align_length
 
-        ###################################################################################################
-        # your code should replace these three statements and populate the three variables: score, alignment1 and alignment2
+        # Cut down sequences to be max character length
+        if len(seq1) > self.max_chars_to_align:
+            seq1 = seq1[: self.max_chars_to_align]
+        if len(seq2) > self.max_chars_to_align:
+            seq2 = seq2[: self.max_chars_to_align]
 
-        # if not banded:
-        score, alignment1, alignment2 = self.solve_unbanded(
-            seq1, seq2, self.max_chars_to_align
-        )
-        # else:
-        #     self.solve_banded()
+        # Solve
+
+        score = 0
+        alignment1 = ""
+        alignment2 = ""
+
+        if not banded:
+            score, alignment1, alignment2 = self.solve_unbanded(seq1, seq2)
+        else:
+            self.solve_banded()
 
         # score = random.random() * 100
         # alignment1 = "abc-easy  DEBUG:({} chars,align_len={}{})".format(
