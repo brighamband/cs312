@@ -158,10 +158,8 @@ class GeneSequencing:
 
         return score, alignment1, alignment2
 
-    def solve_banded(self):
-        pass
-        # return values and backpointers
-        # return score, val_table, back_table
+    def solve_banded(self, seq1, seq2):
+        return 100, "subok1", "subok2"
 
     # This is the method called by the GUI.  _seq1_ and _seq2_ are two sequences to be aligned, _banded_ is a boolean that tells
     # you whether you should compute a banded alignment or full alignment, and _align_length_ tells you
@@ -179,23 +177,11 @@ class GeneSequencing:
 
         # Solve
 
-        score = 0
-        alignment1 = ""
-        alignment2 = ""
-
-        if not banded:
-            score, alignment1, alignment2 = self.solve_unbanded(seq1, seq2)
-        else:
-            self.solve_banded()
-
-        # score = random.random() * 100
-        # alignment1 = "abc-easy  DEBUG:({} chars,align_len={}{})".format(
-        #     len(seq1), align_length, ",BANDED" if banded else ""
-        # )
-        # alignment2 = "as-123--  DEBUG:({} chars,align_len={}{})".format(
-        #     len(seq2), align_length, ",BANDED" if banded else ""
-        # )
-        ###################################################################################################
+        score, alignment1, alignment2 = (
+            self.solve_unbanded(seq1, seq2)
+            if not banded
+            else self.solve_banded(seq1, seq2)
+        )
 
         return {
             "align_cost": score,
