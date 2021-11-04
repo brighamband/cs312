@@ -155,6 +155,31 @@ class GeneSequencing:
         return score, alignment1, alignment2
 
     def solve_banded(self, seq1, seq2):
+
+        # Initialize 2D arrays
+        num_rows = len(seq1) + 1
+        num_cols = 2 * MAXINDELS + 1  # For this project, banded will have 7 columns
+
+        val_table = [
+            [0 for i in range(num_cols)] for j in range(num_rows)
+        ]  # Table that holds edit distance values
+
+        back_table = [
+            [Arrow.NONE for i in range(num_cols)] for j in range(num_rows)
+        ]  # Table that holds back pointers
+
+        back_table[0][MAXINDELS + 1] = Arrow.START  # Starting point
+
+        for i in range(num_rows):
+            val_table[i][0] = (
+                i * INDEL
+            )  # Initialize first col of each row to be i * INDEL
+            back_table[i][0] = Arrow.UP  # Make up back pointers across left col
+
+            for j in range(MAXINDELS + 1):
+                val_table[0][j] = j * INDEL  # Initialize first row of each col to be j
+                back_table[0][j] = Arrow.LEFT  # Make left back pointers across top row
+
         return 100, "subok1", "subok2"
 
     # This is the method called by the GUI.  _seq1_ and _seq2_ are two sequences to be aligned, _banded_ is a boolean that tells
