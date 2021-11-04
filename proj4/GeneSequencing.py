@@ -193,12 +193,10 @@ class GeneSequencing:
 
         for i in range(1, num_rows):
             for j in range(0, num_cols):
-                # Skip over top left corner (out of bounds)
-                if (i + j) <= MAXINDELS:
-                    continue
-
-                # Skip over bottom right corner (out of bounds)
-                if (i + j) >= MAX_IDX_SUM:
+                # Skip out of bounds
+                # - first condition is top left corner
+                # - second condition is bottom right corner
+                if (i + j) <= MAXINDELS or (i + j) >= MAX_IDX_SUM:
                     continue
 
                 val_table[i][j] = math.inf
