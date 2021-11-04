@@ -187,13 +187,57 @@ class GeneSequencing:
 
         return val_table, back_table
 
+    def b_fill_tables(self, seq1, seq2, val_table, back_table, num_rows, num_cols):
+        """Starting at [1,1], fill out the dynamic programming tables that hold values and back pointers."""
+
+        for i in range(1, num_rows):
+            for j in range(0, num_cols):
+                # Skip over left corner
+                if (i + j) <= MAXINDELS:
+                    continue
+
+                val_table[i][j] = math.inf
+
+        # left_ins_cost = INDEL + val_table[i][j - 1]
+        # diag_sub_cost = (
+        #     self.compare_chars(seq1[i - 1], seq2[j - 1])
+        #     + val_table[i - 1][j - 1]
+        # )  # Checks current chars for a match, adds that to diagonal value
+        # up_del_cost = INDEL + val_table[i - 1][j]
+
+        # # Figure out smallest cost
+
+        # # Left first - first tiebreaker
+        # if left_ins_cost <= diag_sub_cost and left_ins_cost <= up_del_cost:
+        #     val_table[i][j] = left_ins_cost
+        #     back_table[i][j] = Arrow.LEFT
+
+        # # Up second - second tiebreaker
+        # elif up_del_cost < left_ins_cost and up_del_cost <= diag_sub_cost:
+        #     val_table[i][j] = up_del_cost
+        #     back_table[i][j] = Arrow.UP
+
+        # # 3rd case - diagonal
+        # else:
+        #     back_table[i][j] = Arrow.DIAG
+        #     val_table[i][j] = diag_sub_cost
+
+        return val_table, back_table
+
     def solve_banded(self, seq1, seq2):
+        # Immediately return if there's significant length discrepancies between seq1 and seq2
+        if (-MAXINDELS) < len(seq1) - len(seq2) < (MAXINDELS):
+            return math.inf, "No Alignment Possible", "No Alignment Possible"
 
         # Initialize 2D arrays
         num_rows = len(seq1) + 1
         num_cols = 2 * MAXINDELS + 1  # For this project, banded will have 7 columns
 
         val_table, back_table = self.b_init_tables(num_rows, num_cols)
+
+        val_table, back_table = self.b_fill_tables(
+            seq1, seq2, val_table, back_table, num_rows, num_cols
+        )
 
         return 100, "subok1", "subok2"
 
