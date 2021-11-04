@@ -51,11 +51,13 @@ class GeneSequencing:
         ]  # Table that holds back pointers
 
         for i in range(num_rows):
-            val_table[i][0] = i  # Initialize first col of each row to be i
+            val_table[i][0] = (
+                i * INDEL
+            )  # Initialize first col of each row to be i * INDEL
             back_table[i][0] = Arrow.UP  # Make up back pointers across left col
 
             for j in range(num_cols):
-                val_table[0][j] = j  # Initialize first row of each col to be j
+                val_table[0][j] = j * INDEL  # Initialize first row of each col to be j
                 back_table[0][j] = Arrow.LEFT  # Make left back pointers across top row
 
         back_table[0][0] = Arrow.START  # Make sure start has its own value
