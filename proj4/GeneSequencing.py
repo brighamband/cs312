@@ -189,15 +189,21 @@ class GeneSequencing:
 
     def b_fill_tables(self, seq1, seq2, val_table, back_table, num_rows, num_cols):
         """Starting at [1,1], fill out the dynamic programming tables that hold values and back pointers."""
+        MAX_IDX_SUM = (len(seq1) - MAXINDELS) + (num_cols - 1)
 
         for i in range(1, num_rows):
             for j in range(0, num_cols):
-                # Skip over left corner
+                # Skip over top left corner (out of bounds)
                 if (i + j) <= MAXINDELS:
+                    continue
+
+                # Skip over bottom right corner (out of bounds)
+                if (i + j) >= MAX_IDX_SUM:
                     continue
 
                 val_table[i][j] = math.inf
 
+        pass
         # left_ins_cost = INDEL + val_table[i][j - 1]
         # diag_sub_cost = (
         #     self.compare_chars(seq1[i - 1], seq2[j - 1])
@@ -226,7 +232,7 @@ class GeneSequencing:
 
     def solve_banded(self, seq1, seq2):
         # Immediately return if there's significant length discrepancies between seq1 and seq2
-        if (-MAXINDELS) < len(seq1) - len(seq2) < (MAXINDELS):
+        if abs(len(seq1) - len(seq2)) > MAXINDELS:
             return math.inf, "No Alignment Possible", "No Alignment Possible"
 
         # Initialize 2D arrays
