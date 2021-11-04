@@ -35,7 +35,7 @@ class GeneSequencing:
     def __init__(self):
         pass
 
-    def init_tables(self, num_rows, num_cols):
+    def u_init_tables(self, num_rows, num_cols):
         """Initializes the value and back pointer tables (0s everywhere, except the value table has i in the first row and col."""
 
         val_table = [
@@ -46,15 +46,17 @@ class GeneSequencing:
             [Arrow.NONE for i in range(num_cols)] for j in range(num_rows)
         ]  # Table that holds back pointers
 
+        # Set up first col
         for i in range(num_rows):
             val_table[i][0] = (
                 i * INDEL
             )  # Initialize first col of each row to be i * INDEL
             back_table[i][0] = Arrow.UP  # Make up back pointers across left col
 
-            for j in range(num_cols):
-                val_table[0][j] = j * INDEL  # Initialize first row of each col to be j
-                back_table[0][j] = Arrow.LEFT  # Make left back pointers across top row
+        # Set up first row
+        for j in range(num_cols):
+            val_table[0][j] = j * INDEL  # Initialize first row of each col to be j
+            back_table[0][j] = Arrow.LEFT  # Make left back pointers across top row
 
         back_table[0][0] = Arrow.START  # Make sure start has its own value
 
@@ -66,7 +68,7 @@ class GeneSequencing:
             return MATCH
         return SUB
 
-    def fill_tables(self, seq1, seq2, val_table, back_table, num_rows, num_cols):
+    def u_fill_tables(self, seq1, seq2, val_table, back_table, num_rows, num_cols):
         """Starting at [1,1], fill out the dynamic programming tables that hold values and back pointers."""
 
         for i in range(1, num_rows):
@@ -97,7 +99,7 @@ class GeneSequencing:
 
         return val_table, back_table
 
-    def find_alignments(self, seq1, seq2, back_table, num_rows, num_cols):
+    def u_find_alignments(self, seq1, seq2, back_table, num_rows, num_cols):
         cur_row = num_rows - 1
         cur_col = num_cols - 1
         back_ptr = back_table[cur_row][cur_col]  # Start at last cell (bottom right)
@@ -139,26 +141,23 @@ class GeneSequencing:
         num_rows = len(seq1) + 1  # Need +1 to account for empty string
         num_cols = len(seq2) + 1  # Need +1 to account for empty string
 
-        val_table, back_table = self.init_tables(num_rows, num_cols)
+        val_table, back_table = self.u_init_tables(num_rows, num_cols)
 
-        val_table, back_table = self.fill_tables(
+        val_table, back_table = self.u_fill_tables(
             seq1, seq2, val_table, back_table, num_rows, num_cols
         )
 
         # Figure out score (it will be the value in the bottom right corner of the value table)
         score = val_table[num_rows - 1][num_cols - 1]
 
-        alignment1, alignment2 = self.find_alignments(
+        alignment1, alignment2 = self.u_find_alignments(
             seq1, seq2, back_table, num_rows, num_cols
         )
 
         return score, alignment1, alignment2
 
-    def solve_banded(self, seq1, seq2):
-
-        # Initialize 2D arrays
-        num_rows = len(seq1) + 1
-        num_cols = 2 * MAXINDELS + 1  # For this project, banded will have 7 columns
+    def b_init_tables(self, num_rows, num_cols):
+        """Initializes the value and back pointer tables (0s everywhere, except the value table has i in the first row and col."""
 
         val_table = [
             [0 for i in range(num_cols)] for j in range(num_rows)
@@ -168,17 +167,33 @@ class GeneSequencing:
             [Arrow.NONE for i in range(num_cols)] for j in range(num_rows)
         ]  # Table that holds back pointers
 
-        back_table[0][MAXINDELS + 1] = Arrow.START  # Starting point
+        # Set up first col
+        for i in range(0, MAXINDELS):
+            val_table[MAXINDELS - i][i] = (
+                MAXINDELS - i
+            ) * INDEL  # Initialize first col of each row to be i * INDEL
+            back_table[MAXINDELS - i][
+                i
+            ] = Arrow.UP  # Make up back pointers across left col
 
-        for i in range(num_rows):
-            val_table[i][0] = (
-                i * INDEL
-            )  # Initialize first col of each row to be i * INDEL
-            back_table[i][0] = Arrow.UP  # Make up back pointers across left col
+        # Set up first row
+        for j in range(MAXINDELS, num_cols):
+            val_table[0][j] = (
+                j - MAXINDELS
+            ) * INDEL  # Initialize first row of each col to be j
+            back_table[0][j] = Arrow.LEFT  # Make left back pointers across top row
 
-            for j in range(MAXINDELS + 1):
-                val_table[0][j] = j * INDEL  # Initialize first row of each col to be j
-                back_table[0][j] = Arrow.LEFT  # Make left back pointers across top row
+        back_table[0][MAXINDELS] = Arrow.START  # Starting point
+
+        return val_table, back_table
+
+    def solve_banded(self, seq1, seq2):
+
+        # Initialize 2D arrays
+        num_rows = len(seq1) + 1
+        num_cols = 2 * MAXINDELS + 1  # For this project, banded will have 7 columns
+
+        val_table, back_table = self.b_init_tables(num_rows, num_cols)
 
         return 100, "subok1", "subok2"
 
