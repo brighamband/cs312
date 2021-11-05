@@ -327,6 +327,6 @@ class GeneSequencing:
 
         return {
             "align_cost": score,
-            "seqi_first100": alignment1,
-            "seqj_first100": alignment2,
+            "seqi_first100": alignment1[:100],
+            "seqj_first100": alignment2[:100],
         }
