@@ -135,7 +135,7 @@ class GeneSequencing:
 
         return alignment1, alignment2
 
-    def solve_unbanded(self, seq1, seq2):
+    def solve_unrestricted(self, seq1, seq2):
         # Initialize 2D arrays
         num_rows = len(seq1) + 1  # Need +1 to account for empty string
         num_cols = len(seq2) + 1  # Need +1 to account for empty string
@@ -187,7 +187,6 @@ class GeneSequencing:
         return val_table, back_table
 
     def b_fill_tables(self, seq1, seq2, val_table, back_table, num_rows, num_cols):
-        """Starting at [1,1], fill out the dynamic programming tables that hold values and back pointers."""
         MAX_IDX_SUM = (
             len(seq2) + MAXINDELS + 1
         )  # Helps us tell when we gone out of bounds on bottom right
@@ -321,7 +320,7 @@ class GeneSequencing:
         # Solve
 
         score, alignment1, alignment2 = (
-            self.solve_unbanded(seq1, seq2)
+            self.solve_unrestricted(seq1, seq2)
             if not banded
             else self.solve_banded(seq1, seq2)
         )
