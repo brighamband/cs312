@@ -136,7 +136,6 @@ class GeneSequencing:
         return alignment1, alignment2
 
     def solve_unbanded(self, seq1, seq2):
-
         # Initialize 2D arrays
         num_rows = len(seq1) + 1  # Need +1 to account for empty string
         num_cols = len(seq2) + 1  # Need +1 to account for empty string
@@ -189,7 +188,8 @@ class GeneSequencing:
 
     def b_fill_tables(self, seq1, seq2, val_table, back_table, num_rows, num_cols):
         """Starting at [1,1], fill out the dynamic programming tables that hold values and back pointers."""
-        MAX_IDX_SUM = (len(seq1) - MAXINDELS) + (num_cols - 1)
+        # MAX_IDX_SUM = (len(seq1) - MAXINDELS) + (num_cols - 1)
+        MAX_IDX_SUM = len(seq2) + MAXINDELS + 1  # OR 2???  # 2 is conversion
 
         for i in range(1, num_rows):
             for j in range(0, num_cols):
@@ -199,34 +199,75 @@ class GeneSequencing:
                 if (i + j) <= MAXINDELS or (i + j) >= MAX_IDX_SUM:
                     continue
 
-                val_table[i][j] = math.inf
+                left_ins_cost = math.inf
+                if j > 0:
+                    left_ins_cost = INDEL + val_table[i][j - 1]
+                diag_sub_cost = math.inf
+                if i > 0:
+                    diag_sub_cost = (
+                        self.compare_chars(seq1[i - 1], seq2[i + j + -MAXINDELS - 1])
+                        + val_table[i - 1][j]
+                    )  # Checks current chars for a match, adds that to diagonal value
+                up_del_cost = math.inf
+                if (j + 1) < num_cols and i > 0:
+                    up_del_cost = INDEL + val_table[i - 1][j + 1]
 
-        pass
-        # left_ins_cost = INDEL + val_table[i][j - 1]
-        # diag_sub_cost = (
-        #     self.compare_chars(seq1[i - 1], seq2[j - 1])
-        #     + val_table[i - 1][j - 1]
-        # )  # Checks current chars for a match, adds that to diagonal value
-        # up_del_cost = INDEL + val_table[i - 1][j]
+                # Figure out smallest cost
 
-        # # Figure out smallest cost
+                # Left first - first tiebreaker
+                if left_ins_cost <= diag_sub_cost and left_ins_cost <= up_del_cost:
+                    val_table[i][j] = left_ins_cost
+                    back_table[i][j] = Arrow.LEFT
 
-        # # Left first - first tiebreaker
-        # if left_ins_cost <= diag_sub_cost and left_ins_cost <= up_del_cost:
-        #     val_table[i][j] = left_ins_cost
-        #     back_table[i][j] = Arrow.LEFT
+                # Up second - second tiebreaker
+                elif up_del_cost < left_ins_cost and up_del_cost <= diag_sub_cost:
+                    val_table[i][j] = up_del_cost
+                    back_table[i][j] = Arrow.UP
 
-        # # Up second - second tiebreaker
-        # elif up_del_cost < left_ins_cost and up_del_cost <= diag_sub_cost:
-        #     val_table[i][j] = up_del_cost
-        #     back_table[i][j] = Arrow.UP
-
-        # # 3rd case - diagonal
-        # else:
-        #     back_table[i][j] = Arrow.DIAG
-        #     val_table[i][j] = diag_sub_cost
+                # 3rd case - diagonal
+                else:
+                    back_table[i][j] = Arrow.DIAG
+                    val_table[i][j] = diag_sub_cost
 
         return val_table, back_table
+
+    def b_find_alignments(self, seq1, seq2, back_table, score_i, score_j):
+        cur_row = score_i
+        cur_col = score_j
+        back_ptr = back_table[cur_row][cur_col]  # Start at last cell (bottom right)
+        alignment1 = ""
+        alignment2 = ""
+        seq2_idx = len(seq2) - 1
+
+        while back_ptr != Arrow.START:
+            if back_ptr == Arrow.LEFT:
+                # Replace seq1 letter with a dash
+                alignment1 = "-" + alignment1
+                # Keep seq2 letter
+                alignment2 = seq2[seq2_idx] + alignment2
+                # Move left 1
+                cur_col -= 1
+            elif back_ptr == Arrow.DIAG:
+                # Keep seq1 letter
+                alignment1 = seq1[cur_row - 1] + alignment1
+                # Keep seq2 letter
+                alignment2 = seq2[seq2_idx] + alignment2
+                # Move up 1
+                cur_row -= 1
+            elif back_ptr == Arrow.UP:
+                # Keep seq1 letter
+                alignment1 = seq1[cur_row - 1] + alignment1
+                # Replace seq2 letter with a dash
+                alignment2 = "-" + alignment2
+                # Move up 1, right 1
+                cur_row -= 1
+                cur_col += 1
+
+            # Move the back_ptr
+            back_ptr = back_table[cur_row][cur_col]
+            seq2_idx -= 1
+
+        return alignment1, alignment2
 
     def solve_banded(self, seq1, seq2):
         # Immediately return if there's significant length discrepancies between seq1 and seq2
@@ -243,7 +284,24 @@ class GeneSequencing:
             seq1, seq2, val_table, back_table, num_rows, num_cols
         )
 
-        return 100, "subok1", "subok2"
+        # Figure out score -- the cell to pull it from depends on the sequence lengths (dimensions of table)
+        score = 0
+        score_i = 0
+        score_j = 0
+        if len(seq1) == len(seq2):
+            score_i = num_rows - 1
+            score_j = 3
+            score = val_table[score_i][score_j]
+        if (len(seq1) + 1) == len(seq2):
+            score_i = num_rows - 1
+            score_j = 4
+            score = val_table[score_i][score_j]
+
+        alignment1, alignment2 = self.b_find_alignments(
+            seq1, seq2, back_table, score_i, score_j
+        )
+
+        return score, alignment1, alignment2
 
     # This is the method called by the GUI.  _seq1_ and _seq2_ are two sequences to be aligned, _banded_ is a boolean that tells
     # you whether you should compute a banded alignment or full alignment, and _align_length_ tells you
