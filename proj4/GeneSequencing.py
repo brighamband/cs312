@@ -188,8 +188,9 @@ class GeneSequencing:
 
     def b_fill_tables(self, seq1, seq2, val_table, back_table, num_rows, num_cols):
         """Starting at [1,1], fill out the dynamic programming tables that hold values and back pointers."""
-        # MAX_IDX_SUM = (len(seq1) - MAXINDELS) + (num_cols - 1)
-        MAX_IDX_SUM = len(seq2) + MAXINDELS + 1  # OR 2???  # 2 is conversion
+        MAX_IDX_SUM = (
+            len(seq2) + MAXINDELS + 1
+        )  # Helps us tell when we gone out of bounds on bottom right
 
         for i in range(1, num_rows):
             for j in range(0, num_cols):
