@@ -23,8 +23,7 @@ def reduce_cost_matrix(matrix):
     col_mins = matrix.min(axis=0)
 
     for i in range(len(col_mins)):
-        if col_mins[i] > 0:
-            matrix[:, i] -= col_mins[i]
+        matrix[:, i] -= col_mins[i]
 
     return matrix
 
