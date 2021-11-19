@@ -63,3 +63,25 @@ def add_path_and_update_matrix(matrix, row_idx, col_idx, parent_bound):
 matrix, lower_bound = add_path_and_update_matrix(matrix, 0, 2, lower_bound)
 
 print(matrix, lower_bound)
+
+from queue import PriorityQueue
+q = PriorityQueue()
+
+# def branch_and_bound(P_O):
+#     q.put(P_O, "random")
+#     bssf = math.inf
+#     while not q.empty():
+#         P = q.get()
+#         if lower_bound(P) < bssf:
+#             T = expand(P)
+#             for i in range(len(T)):
+#                 if test(P[i]) < bssf:
+#                     bssf = test(P[i])
+#                 elif lower_bound(P[i]) < bssf:
+#                     q.put(P[i])
+#     q.put(1, 'first')
+#     q.put(2, 'second')
+#     q.put(4, 'last')
+#     print(q.get())
+    
+# branch_and_bound(0)
