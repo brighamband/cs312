@@ -87,20 +87,23 @@ class TSPSolver:
 
         # Loop through each city
         for startCity in cities:
+            route = [startCity]  # Make new route with starting city
+
             # For each city, try to find a route
             while not foundTour and time.time() - startTime < time_allowance:
-                route = [startCity]  # Make new route with starting city
 
-                cheapestNeighbor = (
-                    startCity  # Initialize to start city so that costTo is inf
-                )
+                cheapestNeighbor = route[
+                    -1
+                ]  # Initialize to start city so that costTo is inf
                 for neighbor in cities:
-                    if startCity.costTo(neighbor) < startCity.costTo(cheapestNeighbor):
+                    if neighbor not in route and route[-1].costTo(neighbor) < route[
+                        -1
+                    ].costTo(cheapestNeighbor):
                         cheapestNeighbor = neighbor
 
                 # If invalid route
                 # break out of while loop, move onto next city (increment i)
-                if startCity.costTo(cheapestNeighbor) == math.inf:
+                if route[-1].costTo(cheapestNeighbor) == math.inf:
                     break
 
                 # Append cheapest neighbor
@@ -109,6 +112,9 @@ class TSPSolver:
                 # If valid route (includes all cities and last has edge back to first)
                 if len(route) == num_cities and route[-1].costTo(route[0]) < math.inf:
                     foundTour = True
+
+            if foundTour:
+                break
 
         solution = TSPSolution(route)
 
