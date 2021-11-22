@@ -42,8 +42,8 @@ class TSPSolver:
         foundTour = False
         count = 0
         bssf = None
-        start_time = time.time()
-        while not foundTour and time.time() - start_time < time_allowance:
+        startTime = time.time()
+        while not foundTour and time.time() - startTime < time_allowance:
             # create a random permutation
             perm = np.random.permutation(ncities)
             route = []
@@ -57,7 +57,7 @@ class TSPSolver:
                 foundTour = True
         end_time = time.time()
         results["cost"] = bssf.cost if foundTour else math.inf
-        results["time"] = end_time - start_time
+        results["time"] = end_time - startTime
         results["count"] = count
         results["soln"] = bssf
         results["max"] = None
@@ -81,33 +81,46 @@ class TSPSolver:
         results = {}
         cities = self._scenario.getCities()
         num_cities = len(cities)
-        found_tour = False
-        count = 0
-        bssf = None
-        start_time = time.time()
+        foundTour = False
+        startTime = time.time()
+        route = []
 
-        while not found_tour and time.time() - start_time < time_allowance:
-            print("cs", cities)
-            # create a random permutation
-            # perm = np.random.permutation(num_cities)
-            # route = []
-            # # Now build the route using the random permutation
-            # for i in range(num_cities):
-            #     route.append(cities[perm[i]])
-            # bssf = TSPSolution(route)
-            # count += 1
-            # if bssf.cost < np.inf:
-            #     # Found a valid route
-            #     found_tour = True
-        # end_time = time.time()
-        # results["cost"] = bssf.cost if found_tour else math.inf
-        # results["time"] = end_time - start_time
-        # results["count"] = count
-        # results["soln"] = bssf
-        # results["max"] = None
-        # results["total"] = None
-        # results["pruned"] = None
-        # return results
+        # Loop through each city
+        for startCity in cities:
+            # For each city, try to find a route
+            while not foundTour and time.time() - startTime < time_allowance:
+                route = [startCity]  # Make new route with starting city
+
+                cheapestNeighbor = (
+                    startCity  # Initialize to start city so that costTo is inf
+                )
+                for neighbor in cities:
+                    if startCity.costTo(neighbor) < startCity.costTo(cheapestNeighbor):
+                        cheapestNeighbor = neighbor
+
+                # If invalid route
+                # break out of while loop, move onto next city (increment i)
+                if startCity.costTo(cheapestNeighbor) == math.inf:
+                    break
+
+                # Append cheapest neighbor
+                route.append(cheapestNeighbor)
+
+                # If valid route (includes all cities and last has edge back to first)
+                if len(route) == num_cities and route[-1].costTo(route[0]) < math.inf:
+                    foundTour = True
+
+        solution = TSPSolution(route)
+
+        end_time = time.time()
+        results["cost"] = solution.cost if foundTour else math.inf
+        results["time"] = end_time - startTime
+        results["count"] = 1 if foundTour else None  # Greedy only finds 1
+        results["soln"] = solution
+        results["max"] = None
+        results["total"] = None
+        results["pruned"] = None
+        return results
 
     """ <summary>
 		This is the entry point for the branch-and-bound algorithm that you will implement
