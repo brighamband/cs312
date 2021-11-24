@@ -35,7 +35,7 @@ def reduce_cost_matrix(matrix, lower_bound):
 
 matrix, lower_bound = reduce_cost_matrix(matrix, lower_bound)
 
-print(matrix, lower_bound)
+# print(matrix, lower_bound)
 
 
 def add_path_and_update_matrix(matrix, row_idx, col_idx, parent_bound):
@@ -62,9 +62,10 @@ def add_path_and_update_matrix(matrix, row_idx, col_idx, parent_bound):
 # FIXME - NEED TO ACCOUNT FOR FACT THAT NAMES DO NOT CORRESPOND WITH INDICES
 matrix, lower_bound = add_path_and_update_matrix(matrix, 0, 2, lower_bound)
 
-print(matrix, lower_bound)
+# print(matrix, lower_bound)
 
 from queue import PriorityQueue
+
 q = PriorityQueue()
 
 # def branch_and_bound(P_O):
@@ -83,5 +84,5 @@ q = PriorityQueue()
 #     q.put(2, 'second')
 #     q.put(4, 'last')
 #     print(q.get())
-    
+
 # branch_and_bound(0)
