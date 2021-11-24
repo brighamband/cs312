@@ -12,10 +12,10 @@
       "console": "integratedTerminal"
     },
     {
-      "name": "Matrix",
+      "name": "Helpers",
       "type": "python",
       "request": "launch",
-      "program": "matrix.py",
+      "program": "helpers.py",
       "console": "integratedTerminal"
     }
   ]
