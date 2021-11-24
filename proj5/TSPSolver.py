@@ -119,6 +119,9 @@ class TSPSolver:
 	"""
 
     def branchAndBound(self, time_allowance=60.0):
+        # Make the upper bound be the greedy solution
+        greedy_res = self.greedy(time_allowance)
+        upper_bound = greedy_res["cost"]
         pass
 
     """ <summary>
