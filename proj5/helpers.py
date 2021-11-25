@@ -1,5 +1,24 @@
+"""
+Helpers file for branch and bound algorithm
+"""
+
 import numpy as np
 import math
+
+# class Node:
+#     def __init__(self, city):
+#         self.city = city
+
+#     def __lt__(self, other):
+#         if SAME:
+#             return self
+#         if self.city.costTo(other) ==
+#     in1=self.ft*12+self.inch
+#     in2=other.ft*12+other.inch
+#     if in1<in2:
+#       return "first object smaller than other"
+#     else:
+#       return "first object not smaller than other"
 
 matrix = np.array(
     [

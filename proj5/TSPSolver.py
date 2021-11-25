@@ -15,7 +15,6 @@ import time
 import numpy as np
 from TSPClasses import *
 import heapq
-import itertools
 
 
 class TSPSolver:
@@ -140,11 +139,13 @@ class TSPSolver:
     def branchAndBound(self, time_allowance=60.0):
         results = {}
         cities = self._scenario.getCities()
-        start_time = time.time()
 
         # Make the upper bound be the greedy solution
         greedy_res = self.greedy(time_allowance)
         initial_bssf = greedy_res["cost"]
+
+        # Start timer
+        start_time = time.time()
 
         # Make cost matrix
         matrix = np.zeros((len(cities), len(cities)))
@@ -154,6 +155,14 @@ class TSPSolver:
 
         # Reduce
         matrix, lower_bound = helpers.reduce_cost_matrix(matrix, 0)
+
+        # Make queue
+        from queue import PriorityQueue
+
+        q = PriorityQueue()
+        cur_city = cities[0]
+        for city in cities:
+            q.put(cur_city.costTo(city), city)
 
         # solution = TSPSolution(route)
 
