@@ -170,6 +170,17 @@ class TSPSolver:
                 q, (matrix[START_CITY_ROW][i], cities[i]._elevation, cities[i])
             )
 
+        while len(q) > 0:
+            cheapest_city = heapq.heappop(q)
+            temp_lower_bound = (
+                lower_bound + cheapest_city[0]
+            )  # Temp is lower before plus prospective cost
+            if temp_lower_bound < bssf:
+                # helpers.add_path_and_update_matrix(
+                #     matrix,
+                # )
+            print(top_city)
+
         # solution = TSPSolution(route)
 
         end_time = time.time()
