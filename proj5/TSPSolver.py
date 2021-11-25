@@ -139,16 +139,17 @@ class TSPSolver:
     def branchAndBound(self, time_allowance=60.0):
         results = {}
         cities = self._scenario.getCities()
+        num_cities = len(cities)
 
         # Make the upper bound be the greedy solution
         greedy_res = self.greedy(time_allowance)
-        initial_bssf = greedy_res["cost"]
+        bssf = greedy_res["cost"]  # Initially set the bssf to be greedy's cost
 
         # Start timer
         start_time = time.time()
 
         # Make cost matrix
-        matrix = np.zeros((len(cities), len(cities)))
+        matrix = np.zeros((num_cities, num_cities))
         for i in range(np.shape(matrix)[0]):  # Rows
             for j in range(np.shape(matrix)[1]):  # Cols
                 matrix[i][j] = cities[i].costTo(cities[j])
@@ -156,13 +157,18 @@ class TSPSolver:
         # Reduce
         matrix, lower_bound = helpers.reduce_cost_matrix(matrix, 0)
 
-        # Make queue
-        from queue import PriorityQueue
+        # Make queue with all cities to start
 
-        q = PriorityQueue()
-        cur_city = cities[0]
-        for city in cities:
-            q.put(cur_city.costTo(city), city)
+        # q = cities
+        # heapq.heapify(q)
+
+        q = []
+
+        START_CITY_ROW = 0  # Matrix costs will be pulled from first row (start city)
+        for i in range(num_cities):
+            heapq.heappush(
+                q, (matrix[START_CITY_ROW][i], cities[i]._elevation, cities[i])
+            )
 
         # solution = TSPSolution(route)
 
