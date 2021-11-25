@@ -179,7 +179,6 @@ class TSPSolver:
                 # helpers.add_path_and_update_matrix(
                 #     matrix,
                 # )
-            print(top_city)
 
         # solution = TSPSolution(route)
 
