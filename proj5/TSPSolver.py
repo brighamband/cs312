@@ -175,7 +175,7 @@ class TSPSolver:
             temp_lower_bound = (
                 lower_bound + cheapest_city[0]
             )  # Temp is lower before plus prospective cost
-            if temp_lower_bound < bssf:
+            # if temp_lower_bound < bssf:
                 # helpers.add_path_and_update_matrix(
                 #     matrix,
                 # )

@@ -4,21 +4,20 @@ Helpers file for branch and bound algorithm
 
 import numpy as np
 import math
+import copy
 
-# class Node:
-#     def __init__(self, city):
-#         self.city = city
 
-#     def __lt__(self, other):
-#         if SAME:
-#             return self
-#         if self.city.costTo(other) ==
-#     in1=self.ft*12+self.inch
-#     in2=other.ft*12+other.inch
-#     if in1<in2:
-#       return "first object smaller than other"
-#     else:
-#       return "first object not smaller than other"
+class Node:
+    def __init__(self, city, lower_bound, cost_matrix, route):
+        self.city = city
+        self.lower_bound = lower_bound
+        self.cost_matrix = copy.deepcopy(cost_matrix)
+        self.route = copy.deepcopy(route)
+
+    def __lt__(self, other):
+        if other.lower_bound > self.lower_bound:
+            return other
+
 
 matrix = np.array(
     [
@@ -82,10 +81,6 @@ def add_path_and_update_matrix(matrix, row_idx, col_idx, parent_bound):
 matrix, lower_bound = add_path_and_update_matrix(matrix, 0, 2, lower_bound)
 
 # print(matrix, lower_bound)
-
-from queue import PriorityQueue
-
-q = PriorityQueue()
 
 # def branch_and_bound(P_O):
 #     q.put(P_O, "random")
