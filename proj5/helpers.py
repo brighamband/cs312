@@ -7,9 +7,10 @@ import math
 import copy
 
 
+# Node in the Branch and Bound Tree
 class Node:
     def __init__(self, city, lower_bound, cost_matrix, route):
-        self.city = city
+        self.city = city  # FIXME - Is this one necessary??
         self.lower_bound = lower_bound
         self.cost_matrix = copy.deepcopy(cost_matrix)
         self.route = copy.deepcopy(route)
