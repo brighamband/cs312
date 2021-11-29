@@ -100,7 +100,7 @@ class TSPSolver:
                     ].costTo(cheapest_neighbor):
                         cheapest_neighbor = neighbor
 
-                # If invalid route
+                # If invalid route - no neighbors
                 # break out of while loop, move onto next city (increment i)
                 if route[-1].costTo(cheapest_neighbor) == math.inf:
                     break
@@ -155,27 +155,27 @@ class TSPSolver:
                 matrix[i][j] = cities[i].costTo(cities[j])
 
         # Make Node class
-        node = Node(0, matrix, [])
+        node = Node(0, matrix, [cities[0]])  # Have first city in queue
 
         # Reduce
         node.reduce_cost_matrix()
 
-        # Make queue with all cities to start
-
-        # q = cities
-        # heapq.heapify(q)
-
+        # Make queue (following B&B pseudo code from here)
         q = []
+        heapq.heappush(q, node)
 
-        START_CITY_ROW = 0  # Matrix costs will be pulled from first row (start city)
-        for i in range(num_cities):
-            heapq.heappush(
-                q, (matrix[START_CITY_ROW][i], cities[i]._elevation, cities[i])
-            )
+        # START_CITY_ROW = 0  # Matrix costs will be pulled from first row (start city)
+        # for i in range(num_cities):
+        #     heapq.heappush(
+        #         q, (matrix[START_CITY_ROW][i], cities[i]._elevation, cities[i])
+        #     )
 
         while len(q) > 0:
-            cheapest_city = heapq.heappop(q)
-            temp_lower_bound = cheapest_city.lower_bound
+            top_node = heapq.heappop(q)
+
+            if top_node.lower_bound < bssf:
+                T = expand(top_node)
+            temp_lower_bound = top_node.lower_bound
             temp_lower_bound = (
                 lower_bound + cheapest_city[0]
             )  # Temp is lower before plus prospective cost
