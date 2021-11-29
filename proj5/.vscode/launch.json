@@ -12,10 +12,10 @@
       "console": "integratedTerminal"
     },
     {
-      "name": "Helpers",
+      "name": "Node",
       "type": "python",
       "request": "launch",
-      "program": "helpers.py",
+      "program": "node.py",
       "console": "integratedTerminal"
     }
   ]

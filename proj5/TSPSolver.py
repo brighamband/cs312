@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 
 from which_pyqt import PYQT_VER
-import helpers
 
 if PYQT_VER == "PYQT5":
     from PyQt5.QtCore import QLineF, QPointF
@@ -15,6 +14,7 @@ import time
 import numpy as np
 from TSPClasses import *
 import heapq
+from node import Node
 
 
 class TSPSolver:
@@ -120,7 +120,7 @@ class TSPSolver:
         end_time = time.time()
         results["cost"] = solution.cost if found_tour else math.inf
         results["time"] = end_time - start_time
-        results["count"] = 1 if found_tour else None  # Greedy only finds 1
+        results["count"] = 1 if found_tour else 0  # Greedy only finds 1
         results["soln"] = solution
         results["max"] = None
         results["total"] = None
@@ -154,8 +154,11 @@ class TSPSolver:
             for j in range(np.shape(matrix)[1]):  # Cols
                 matrix[i][j] = cities[i].costTo(cities[j])
 
+        # Make Node class
+        node = Node(0, matrix, [])
+
         # Reduce
-        matrix, lower_bound = helpers.reduce_cost_matrix(matrix, 0)
+        node.reduce_cost_matrix()
 
         # Make queue with all cities to start
 
@@ -172,6 +175,7 @@ class TSPSolver:
 
         while len(q) > 0:
             cheapest_city = heapq.heappop(q)
+            temp_lower_bound = cheapest_city.lower_bound
             temp_lower_bound = (
                 lower_bound + cheapest_city[0]
             )  # Temp is lower before plus prospective cost
@@ -179,6 +183,24 @@ class TSPSolver:
             # helpers.add_path_and_update_matrix(
             #     matrix,
             # )
+
+        # TEST RANDOM PSEUDO CODE
+        # def branch_and_bound(P_O):
+        #     q.put(P_O, "random")
+        #     bssf = math.inf
+        #     while not q.empty():
+        #         P = q.get()
+        #         if lower_bound(P) < bssf:
+        #             T = expand(P)
+        #             for i in range(len(T)):
+        #                 if test(P[i]) < bssf:
+        #                     bssf = test(P[i])
+        #                 elif lower_bound(P[i]) < bssf:
+        #                     q.put(P[i])
+        #     q.put(1, 'first')
+        #     q.put(2, 'second')
+        #     q.put(4, 'last')
+        #     print(q.get())
 
         # solution = TSPSolution(route)
 
