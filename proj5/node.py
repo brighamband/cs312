@@ -2,6 +2,8 @@
 Helpers file for branch and bound algorithm
 """
 
+from TSPClasses import TSPSolution
+import heapq
 import numpy as np
 import math
 import copy
@@ -9,15 +11,17 @@ import copy
 
 # Node containing state in the Branch and Bound Tree
 class Node:
-    def __init__(self, lower_bound, cost_matrix, route):
+    def __init__(self, lower_bound, cost_matrix, route, idx):
         self.lower_bound = lower_bound
         self.cost_matrix = copy.deepcopy(cost_matrix)
         self.route = copy.deepcopy(route)
+        self.idx = idx
 
     def __lt__(self, other):
-        if other.lower_bound > self.lower_bound:
-            return other
-        return self
+        # if other.lower_bound > self.lower_bound:
+        #     return other
+        # return self
+        return self.lower_bound <= other.lower_bound
 
     # Returns a reduced cost matrix (0s in every row and col with the adjusted differences) for a given cost matrix
     def reduce_cost_matrix(self):
@@ -37,7 +41,7 @@ class Node:
                 self.cost_matrix[:, i] -= col_mins[i]
                 self.lower_bound += col_mins[i]
 
-    def add_path_and_update_matrix(self, row_idx, col_idx):
+    def add_city_cost_to_matrix(self, row_idx, col_idx):
         # Update parent bound to now have updated cost
         self.lower_bound += self.cost_matrix[row_idx, col_idx]
 
@@ -48,14 +52,42 @@ class Node:
         self.cost_matrix[:, col_idx] = math.inf
 
         # Eliminate the opposite cell (don't let it go back)
-        last_path = len(self.cost_matrix[0]) == len(
-            self.route
+        last_path = len(self.route) == np.shape(
+            self.cost_matrix[0]
         )  # FIXME - Add in logic that checks to see if all nodes have been visited and it can go back
         if not last_path:
             self.cost_matrix[col_idx][row_idx] = math.inf
 
         # Reduce cost matrix again
         self.reduce_cost_matrix()
+
+    # Returns a queue of children nodes from a given parent
+    def expand(self):
+        parent_node = self.route[-1]
+
+        q = []
+        for child in children:
+            # Initialize child as parent
+            child_node = Node(
+                parent_node.lower_bound, parent_node.cost_matrix, parent_node.route
+            )
+
+            # Infinity out row and col for current city and update lower bound
+            self.add_city_cost_to_matrix(parent_node.idx, child_node.idx)
+
+            heapq.heappush(q, child_node)
+
+        return q
+
+    # Returns infinity if incomplete route, then returns the cost if complete
+    def test_complete_route(self):
+        # Complete if it includes all cities and last has edge back to first
+        if (
+            len(self.route) == np.shape(self.cost_matrix[0])
+            and self.route[-1].costTo(self.route[0]) < math.inf
+        ):
+            return TSPSolution(self.route)
+        return math.inf
 
 
 # TESTING

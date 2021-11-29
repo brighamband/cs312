@@ -108,7 +108,7 @@ class TSPSolver:
                 # Append cheapest neighbor
                 route.append(cheapest_neighbor)
 
-                # If valid route (includes all cities and last has edge back to first)
+                # If complete route (includes all cities and last has edge back to first)
                 if len(route) == len(cities) and route[-1].costTo(route[0]) < math.inf:
                     found_tour = True
 
@@ -144,6 +144,8 @@ class TSPSolver:
         # Make the upper bound be the greedy solution
         greedy_res = self.greedy(time_allowance)
         bssf = greedy_res["cost"]  # Initially set the bssf to be greedy's cost
+        best_route = greedy_res["soln"]  # Initially set to be greedy's soln
+        solutions_count = 0  # Number of complete solutions (number of times hit bottom)
 
         # Start timer
         start_time = time.time()
@@ -155,60 +157,35 @@ class TSPSolver:
                 matrix[i][j] = cities[i].costTo(cities[j])
 
         # Make Node class
-        node = Node(0, matrix, [cities[0]])  # Have first city in queue
+        start_node = Node(0, matrix, [cities[0]])  # Have first city in queue
 
         # Reduce
-        node.reduce_cost_matrix()
+        start_node.reduce_cost_matrix()
 
         # Make queue (following B&B pseudo code from here)
         q = []
-        heapq.heappush(q, node)
-
-        # START_CITY_ROW = 0  # Matrix costs will be pulled from first row (start city)
-        # for i in range(num_cities):
-        #     heapq.heappush(
-        #         q, (matrix[START_CITY_ROW][i], cities[i]._elevation, cities[i])
-        #     )
+        heapq.heappush(q, start_node)  # Only have start node to begin
 
         while len(q) > 0:
-            top_node = heapq.heappop(q)
+            cheapest_node = heapq.heappop(q)
 
-            if top_node.lower_bound < bssf:
-                T = expand(top_node)
-            temp_lower_bound = top_node.lower_bound
-            temp_lower_bound = (
-                lower_bound + cheapest_city[0]
-            )  # Temp is lower before plus prospective cost
-            # if temp_lower_bound < bssf:
-            # helpers.add_path_and_update_matrix(
-            #     matrix,
-            # )
+            if cheapest_node.lower_bound < bssf:
+                child_nodes = cheapest_node.expand()
 
-        # TEST RANDOM PSEUDO CODE
-        # def branch_and_bound(P_O):
-        #     q.put(P_O, "random")
-        #     bssf = math.inf
-        #     while not q.empty():
-        #         P = q.get()
-        #         if lower_bound(P) < bssf:
-        #             T = expand(P)
-        #             for i in range(len(T)):
-        #                 if test(P[i]) < bssf:
-        #                     bssf = test(P[i])
-        #                 elif lower_bound(P[i]) < bssf:
-        #                     q.put(P[i])
-        #     q.put(1, 'first')
-        #     q.put(2, 'second')
-        #     q.put(4, 'last')
-        #     print(q.get())
-
-        # solution = TSPSolution(route)
+                for child_node in child_nodes:
+                    # If you hit the bottom of tree (complete route)
+                    if child_node.test_complete_route() < bssf:
+                        bssf = child_node.test_complete_route()
+                        best_route = child_node.route
+                        solutions_count += 1
+                    elif child_node.lower_bound < bssf:
+                        heapq.heappush(q, child_node)
 
         end_time = time.time()
-        # results["cost"] = solution.cost
+        results["cost"] = bssf
         results["time"] = end_time - start_time
-        results["count"] = 999  # FIXME - How many times you hit bottom
-        # results["soln"] = solution
+        results["count"] = solutions_count
+        results["soln"] = TSPSolution(best_route)
         results["max"] = None
         results["total"] = None
         results["pruned"] = None
