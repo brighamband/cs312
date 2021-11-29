@@ -180,8 +180,6 @@ class TSPSolver:
             #     matrix,
             # )
 
-        print("hello")
-
         # solution = TSPSolution(route)
 
         end_time = time.time()
