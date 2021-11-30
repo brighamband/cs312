@@ -149,6 +149,7 @@ class TSPSolver:
         solutions_count = 0  # Number of complete solutions (number of times hit bottom)
         max_queue_size = 0
         node_total = 0
+        pruned_total = 0
 
         # Start timer
         start_time = time.time()
@@ -170,8 +171,7 @@ class TSPSolver:
         q = []
         heapq.heappush(q, start_node)  # Only have start node to begin
 
-        time_is_remaining = time.time() - start_time < time_allowance
-        while len(q) > 0 and time_is_remaining:
+        while len(q) > 0 and time.time() - start_time < time_allowance:
             if len(q) > max_queue_size:
                 max_queue_size = len(q)
 
@@ -188,6 +188,8 @@ class TSPSolver:
                         solutions_count += 1
                     elif child_node.lower_bound < bssf.cost:
                         heapq.heappush(q, child_node)
+                    else:  # Skip over it (prune)
+                        pruned_total += 1
 
         end_time = time.time()
         results["cost"] = bssf.cost
@@ -196,7 +198,7 @@ class TSPSolver:
         results["soln"] = bssf
         results["max"] = max_queue_size
         results["total"] = node_total
-        results["pruned"] = None
+        results["pruned"] = pruned_total
         return results
 
     """ <summary>
