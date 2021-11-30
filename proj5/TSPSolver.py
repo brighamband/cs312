@@ -170,7 +170,7 @@ class TSPSolver:
             cheapest_node = heapq.heappop(q)
 
             if cheapest_node.lower_bound < bssf:
-                child_nodes = cheapest_node.expand()
+                child_nodes = cheapest_node.expand(cities)
 
                 for child_node in child_nodes:
                     # If you hit the bottom of tree (complete route)

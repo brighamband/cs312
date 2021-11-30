@@ -15,7 +15,6 @@ class Node:
         self.lower_bound = lower_bound
         self.cost_matrix = copy.deepcopy(cost_matrix)
         self.route = copy.deepcopy(route)
-        self.idx = idx
 
     def __lt__(self, other):
         # if other.lower_bound > self.lower_bound:
@@ -62,22 +61,23 @@ class Node:
         self.reduce_cost_matrix()
 
     # Returns a queue of children nodes from a given parent
-    def expand(self):
-        parent_node = self.route[-1]
+    def expand(self, cities):
+        parent_city = self.route[-1]
 
-        q = []
-        for child in children:
+        children_nodes = []
+        for city in cities:
+            if parent_city.costTo(city) == math.inf:  # Skip over own city
+                break
+
             # Initialize child as parent
-            child_node = Node(
-                parent_node.lower_bound, parent_node.cost_matrix, parent_node.route
-            )
+            child_node = Node(self.lower_bound, self.cost_matrix, self.route)
 
             # Infinity out row and col for current city and update lower bound
-            self.add_city_cost_to_matrix(parent_node.idx, child_node.idx)
+            child_node.add_city_cost_to_matrix(parent_city._index, city._index)
 
-            heapq.heappush(q, child_node)
+            children_nodes.append(child_node)
 
-        return q
+        return children_nodes
 
     # Returns infinity if incomplete route, then returns the cost if complete
     def test_complete_route(self):
