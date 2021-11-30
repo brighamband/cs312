@@ -46,7 +46,7 @@ class Node:
                 self.cost_matrix[:, i] -= col_mins[i]
                 self.lower_bound += col_mins[i]
 
-    def add_city_cost_to_matrix(self, row_idx, col_idx):
+    def update_child_matrix(self, row_idx, col_idx):
         # Update parent bound to now have updated cost
         self.lower_bound += self.cost_matrix[row_idx, col_idx]
 
@@ -70,7 +70,7 @@ class Node:
     def expand(self, cities):
         parent_city = self.route[-1]
 
-        children_nodes = []
+        child_nodes = []
         for city in cities:
             if parent_city.costTo(city) == math.inf:  # Skip over own city
                 continue
@@ -78,12 +78,15 @@ class Node:
             # Initialize child as parent
             child_node = Node(self.lower_bound, self.cost_matrix, self.route)
 
+            # Add city to route
+            child_node.route.append(city)
+
             # Infinity out row and col for current city and update lower bound
-            child_node.add_city_cost_to_matrix(parent_city._index, city._index)
+            child_node.update_child_matrix(parent_city._index, city._index)
 
-            children_nodes.append(child_node)
+            child_nodes.append(child_node)
 
-        return children_nodes
+        return child_nodes
 
     # Returns infinity if incomplete route, then returns the cost if complete
     def test_complete_route(self):
