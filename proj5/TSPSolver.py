@@ -143,8 +143,7 @@ class TSPSolver:
 
         # Make the upper bound be the greedy solution
         greedy_res = self.greedy(time_allowance)
-        bssf = greedy_res["cost"]  # Initially set the bssf to be greedy's cost
-        best_route = greedy_res["soln"]  # Initially set to be greedy's soln
+        bssf = greedy_res["soln"]  # Initially set the bssf to be greedy's
         solutions_count = 0  # Number of complete solutions (number of times hit bottom)
 
         # Start timer
@@ -169,23 +168,22 @@ class TSPSolver:
         while len(q) > 0:
             cheapest_node = heapq.heappop(q)
 
-            if cheapest_node.lower_bound < bssf:
+            if cheapest_node.lower_bound < bssf.cost:
                 child_nodes = cheapest_node.expand(cities)
 
                 for child_node in child_nodes:
                     # If you hit the bottom of tree (complete route)
-                    if child_node.test_complete_route() < bssf:
-                        bssf = child_node.test_complete_route()
-                        best_route = child_node.route
+                    if child_node.test_complete_route() < bssf.cost:
+                        bssf = TSPSolution(child_node)
                         solutions_count += 1
                     elif child_node.lower_bound < bssf:
                         heapq.heappush(q, child_node)
 
         end_time = time.time()
-        results["cost"] = bssf
+        results["cost"] = bssf.cost
         results["time"] = end_time - start_time
         results["count"] = solutions_count
-        results["soln"] = TSPSolution(best_route.route)
+        results["soln"] = bssf
         results["max"] = None
         results["total"] = None
         results["pruned"] = None
