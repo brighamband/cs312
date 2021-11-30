@@ -144,7 +144,11 @@ class TSPSolver:
         # Make the upper bound be the greedy solution
         greedy_res = self.greedy(time_allowance)
         bssf = greedy_res["soln"]  # Initially set the bssf to be greedy's
+
+        # Initialize other returned variables
         solutions_count = 0  # Number of complete solutions (number of times hit bottom)
+        max_queue_size = 0
+        node_total = 0
 
         # Start timer
         start_time = time.time()
@@ -157,6 +161,7 @@ class TSPSolver:
 
         # Make Node class
         start_node = Node(0, matrix, [cities[0]])  # Have first city in queue
+        node_total += 1
 
         # Reduce
         start_node.reduce_cost_matrix()
@@ -166,10 +171,14 @@ class TSPSolver:
         heapq.heappush(q, start_node)  # Only have start node to begin
 
         while len(q) > 0 and time.time() - start_time < time_allowance:
+            if len(q) > max_queue_size:
+                max_queue_size = len(q)
+
             cheapest_node = heapq.heappop(q)
 
             if cheapest_node.lower_bound < bssf.cost:
                 child_nodes = cheapest_node.expand(cities)
+                node_total += len(child_nodes)
 
                 for child_node in child_nodes:
                     # If you hit the bottom of tree (complete route)
@@ -184,8 +193,8 @@ class TSPSolver:
         results["time"] = end_time - start_time
         results["count"] = solutions_count
         results["soln"] = bssf
-        results["max"] = None
-        results["total"] = None
+        results["max"] = max_queue_size
+        results["total"] = node_total
         results["pruned"] = None
         return results
 
