@@ -57,11 +57,7 @@ class Node:
         self.cost_matrix[:, col_idx] = math.inf
 
         # Eliminate the opposite cell (don't let it go back)
-        last_path = len(self.route) == np.shape(
-            self.cost_matrix[0]
-        )  # FIXME - Add in logic that checks to see if all nodes have been visited and it can go back
-        if not last_path:
-            self.cost_matrix[col_idx][row_idx] = math.inf
+        self.cost_matrix[col_idx][row_idx] = math.inf
 
         # Reduce cost matrix again
         self.reduce_cost_matrix()

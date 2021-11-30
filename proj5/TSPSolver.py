@@ -170,7 +170,8 @@ class TSPSolver:
         q = []
         heapq.heappush(q, start_node)  # Only have start node to begin
 
-        while len(q) > 0 and time.time() - start_time < time_allowance:
+        time_is_remaining = time.time() - start_time < time_allowance
+        while len(q) > 0 and time_is_remaining:
             if len(q) > max_queue_size:
                 max_queue_size = len(q)
 
