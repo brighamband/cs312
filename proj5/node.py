@@ -19,8 +19,8 @@ class Node:
         self_depth_left = np.shape(self.cost_matrix)[0] - len(self.route)
         other_depth_left = np.shape(other.cost_matrix)[0] - len(other.route)
 
-        # If one node has to go 5 or less deeper than another
-        if np.abs(self_depth_left - other_depth_left) <= 5:
+        # If one node has to go 5 or less to go deeper than another
+        if np.abs(self_depth_left - other_depth_left) >= 5:
             if other_depth_left < self_depth_left:
                 return False  # Choose other
             return True  # Choose self

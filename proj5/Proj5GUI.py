@@ -437,7 +437,7 @@ class Proj5GUI(QMainWindow):
         self.tourCost = QLineEdit("--")
         self.tourCost.setFixedWidth(100)
         self.solvedIn = QLineEdit("--")
-        self.solvedIn.setFixedWidth(200)
+        self.solvedIn.setFixedWidth(400)
         self.maxQSize = QLineEdit("--")
         # self.maxQSize.setFixedWidth(100)
         self.totalStates = QLineEdit("--")
