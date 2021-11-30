@@ -1,7 +1,3 @@
-"""
-Helpers file for branch and bound algorithm
-"""
-
 from TSPClasses import TSPSolution
 import numpy as np
 import math
