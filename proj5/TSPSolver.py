@@ -89,6 +89,7 @@ class TSPSolver:
             route = [start_city]  # Make new route with starting city
 
             # For each city, try to find a route
+            # T O(n) - Worst case has to do this for all the cities
             while not found_tour and time.time() - start_time < time_allowance:
 
                 cheapest_neighbor = route[
