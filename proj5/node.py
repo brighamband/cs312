@@ -71,18 +71,21 @@ class Node:
         parent_city = self.route[-1]
 
         child_nodes = []
-        for city in cities:
-            if parent_city.costTo(city) == math.inf:  # Skip over own city
+
+        # Get all children from parent (look through each column for parent row)
+        for child_i in range(len(cities)):
+            # Skip over own cities and any ones that you cannot access from own
+            if self.cost_matrix[parent_city._index, child_i] == math.inf:
                 continue
 
             # Initialize child as parent
             child_node = Node(self.lower_bound, self.cost_matrix, self.route)
 
             # Add city to route
-            child_node.route.append(city)
+            child_node.route.append(cities[child_i])
 
             # Infinity out row and col for current city and update lower bound
-            child_node.update_child_matrix(parent_city._index, city._index)
+            child_node.update_child_matrix(parent_city._index, child_i)
 
             child_nodes.append(child_node)
 
