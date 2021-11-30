@@ -12,13 +12,6 @@ class Node:
         self.route = copy.deepcopy(route)
 
     def __lt__(self, other):
-        self_depth_left = np.shape(self.cost_matrix)[0] - len(self.route)
-        other_depth_left = np.shape(other.cost_matrix)[0] - len(other.route)
-
-        # Balance lower bound and depth left
-        return (self.lower_bound + (self_depth_left * 3)) < (
-            other.lower_bound + (other_depth_left * 3)
-        )
         return (self.lower_bound / len(self.route)) < (
             other.lower_bound / len(other.route)
         )
