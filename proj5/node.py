@@ -16,9 +16,6 @@ class Node:
         self.route = copy.deepcopy(route)
 
     def __lt__(self, other):
-        # if other.lower_bound > self.lower_bound:
-        #     return other
-        # return self
         return self.lower_bound <= other.lower_bound
 
     # Returns a reduced cost matrix (0s in every row and col with the adjusted differences) for a given cost matrix
