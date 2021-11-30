@@ -11,7 +11,7 @@ import copy
 
 # Node containing state in the Branch and Bound Tree
 class Node:
-    def __init__(self, lower_bound, cost_matrix, route, idx):
+    def __init__(self, lower_bound, cost_matrix, route):
         self.lower_bound = lower_bound
         self.cost_matrix = copy.deepcopy(cost_matrix)
         self.route = copy.deepcopy(route)

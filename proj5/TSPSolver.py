@@ -185,7 +185,7 @@ class TSPSolver:
         results["cost"] = bssf
         results["time"] = end_time - start_time
         results["count"] = solutions_count
-        results["soln"] = TSPSolution(best_route)
+        results["soln"] = TSPSolution(best_route.route)
         results["max"] = None
         results["total"] = None
         results["pruned"] = None
