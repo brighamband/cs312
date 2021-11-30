@@ -165,7 +165,7 @@ class TSPSolver:
         q = []
         heapq.heappush(q, start_node)  # Only have start node to begin
 
-        while len(q) > 0:
+        while len(q) > 0 and time.time() - start_time < time_allowance:
             cheapest_node = heapq.heappop(q)
 
             if cheapest_node.lower_bound < bssf.cost:
