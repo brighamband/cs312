@@ -3,7 +3,6 @@ Helpers file for branch and bound algorithm
 """
 
 from TSPClasses import TSPSolution
-import heapq
 import numpy as np
 import math
 import copy
