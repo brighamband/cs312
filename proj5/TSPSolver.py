@@ -174,9 +174,9 @@ class TSPSolver:
                 for child_node in child_nodes:
                     # If you hit the bottom of tree (complete route)
                     if child_node.test_complete_route() < bssf.cost:
-                        bssf = TSPSolution(child_node)
+                        bssf = TSPSolution(child_node.route)
                         solutions_count += 1
-                    elif child_node.lower_bound < bssf:
+                    elif child_node.lower_bound < bssf.cost:
                         heapq.heappush(q, child_node)
 
         end_time = time.time()
