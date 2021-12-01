@@ -184,8 +184,12 @@ class TSPSolver:
 
                 for child_node in child_nodes:
                     # If you hit the bottom of tree (complete route)
-                    if child_node.test_complete_route() < bssf.cost:
-                        bssf = TSPSolution(child_node.route)
+                    child_solution = TSPSolution(child_node.route)
+                    if (
+                        child_node.is_complete_route()
+                        and child_solution.cost < bssf.cost
+                    ):
+                        bssf = child_solution
                         solutions_count += 1
                     elif child_node.lower_bound < bssf.cost:
                         heapq.heappush(q, child_node)

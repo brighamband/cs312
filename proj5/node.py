@@ -16,6 +16,15 @@ class Node:
             other.lower_bound / len(other.route)
         )
 
+    def is_complete_route(self):
+        # Complete if it includes all cities and last has edge back to first
+        if (
+            len(self.route) == np.shape(self.cost_matrix)[0]
+            and self.route[-1].costTo(self.route[0]) < math.inf
+        ):
+            return True
+        return False
+
     # Returns a reduced cost matrix (0s in every row and col with the adjusted differences) for a given cost matrix
     def reduce_cost_matrix(self):
         # Find zero and difference for each row
@@ -74,16 +83,6 @@ class Node:
             child_nodes.append(child_node)
 
         return child_nodes
-
-    # Returns infinity if incomplete route, then returns the cost if complete
-    def test_complete_route(self):
-        # Complete if it includes all cities and last has edge back to first
-        if (
-            len(self.route) == np.shape(self.cost_matrix)[0]
-            and self.route[-1].costTo(self.route[0]) < math.inf
-        ):
-            return TSPSolution(self.route).cost
-        return math.inf
 
 
 # TESTING
