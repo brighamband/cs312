@@ -97,11 +97,6 @@ class Node:
 #     ]
 # )
 
-# lower_bound = 0
-
-
 # node = Node(0, matrix, [])
 # node.reduce_cost_matrix()
 # node.add_path_and_update_matrix(0, 2)
-
-# pass
